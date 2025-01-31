@@ -1,0 +1,99 @@
+[
+  {
+    "id": 1,
+    "title": "도프샵",
+    "price": 38.9,
+    "description": "캐주얼 오버핏 흑청 자켓",
+    "category": "women's clothing",
+    "image": "/도프샵.png"
+  },
+  {
+    "id": 7,
+    "title": "톤오브",
+    "price": 109,
+    "description": "미니 토트 크로스백",
+    "category": "bag",
+    "image": "/톤오브.png"
+  },
+
+  {
+    "id": 3,
+    "title": "뉴얼",
+    "price": 67.15,
+    "description": "클레어 몰드 스트랩 샌들",
+    "category": "shoes",
+    "image": "/뉴얼.png"
+  },
+  {
+    "id": 4,
+    "title": "모먼트",
+    "price": 32.32,
+    "description": "베이직 스틸레토힐",
+    "category": "shoes",
+    "image": "/어드리모먼트.png"
+  },
+  {
+    "id": 5,
+    "title": "블루프렌치",
+    "price": 168,
+    "description": "핀덕 스트레이트 일자 팬츠",
+    "category": "pants",
+    "image": "/블루프렌치.png"
+  },
+  {
+    "id": 9,
+    "title": "로즈도리",
+    "price": 11.4,
+    "description": "캐시미어 울 라운드 니트",
+    "category": "women's clothing",
+    "image": "/로즈도리.png"
+  },
+  {
+    "id": 8,
+    "title": "리해르",
+    "price": 78.3,
+    "description": "데일리 포켓 백팩",
+    "category": "bag",
+    "image": "/리해르.png"
+  },
+  {
+    "id": 13,
+    "title": "에스트리",
+    "price": 26.26,
+    "description": "베이직 라운드 가디건",
+    "category": "women's clothing",
+    "image": "/에스트리.png"
+  },
+  {
+    "id": 11,
+    "title": "립온",
+    "price": 41.5,
+    "description": "뉴 보부상 숄더백",
+    "category": "bag",
+    "image": "/립온.png"
+  },
+  {
+    "id": 10,
+    "title": "머룬",
+    "price": 51.89,
+    "description": "어바웃 벨트 숄더백",
+    "category": "bag",
+    "image": "/머룬.png"
+  },
+  {
+    "id": 2,
+    "title": "페스트델리 ",
+    "price": 15.99,
+    "description": "소가죽 메리제인 플랫슈즈",
+    "category": "shoes",
+    "image": "/페스트델리.png"
+  },
+  {
+    "id": 12,
+    "title": "그레이프",
+    "price": 32.39,
+    "description": "프리미엄 숏 패딩 점퍼",
+    "category": "women's clothing",
+    "image": "/그레이프.png"
+  }
+]
