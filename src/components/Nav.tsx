@@ -22,7 +22,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
       <div className="max-w-[1020px] mx-auto flex justify-between items-center p-4 fixed top-0 left-0 right-0 z-[1000] bg-[#f3f3f3] dark:bg-gray-800 text-black dark:text-white">
         <div className="flex items-center relative">
           <p className="font-bold text-2xl text-gray-800 dark:text-white italic">
-            로고
+            EShop
           </p>
         </div>
 
@@ -52,7 +52,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
           </button>
 
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/search")}
             aria-label="검색"
             className="text-black dark:text-white text-[1.5rem] leading-8 cursor-pointer m-[10px]"
           >

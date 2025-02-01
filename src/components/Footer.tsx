@@ -8,9 +8,9 @@ const Footer = () => {
           <div className="flex mt-2 w-full">
             <div>
               <h1 className="mt-2 text-2xl font-bold text-black dark:text-white mb-4">
-                로고
+                EShop
               </h1>
-              <p className="text-sm">(주)로고 | 대표: 박민주</p>
+              <p className="text-sm">(주) EShop | 대표: 박민주</p>
               <p className="mt-4 text-sm">About Us</p>
               <p className="mt-2 text-sm">
                 최신 트렌드와 다양한 스타일 중심인 커머스 플랫폼
