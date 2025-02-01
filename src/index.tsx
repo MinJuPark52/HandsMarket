@@ -8,6 +8,8 @@ import App from "./App.tsx";
 import Login from "./pages/login.tsx";
 import Signup from "./pages/signup.tsx";
 import Cart from "./pages/cart.tsx";
+import Search from "./pages/search.tsx";
+import ProductDetail from "./pages/detail.tsx";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,6 +21,8 @@ root.render(
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/product/:id" element={<ProductDetail />} />
     </Routes>
   </Router>
 );

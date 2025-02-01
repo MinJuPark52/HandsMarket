@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FiHeart } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 interface Product {
   id: number;
@@ -36,11 +37,13 @@ const Products = () => {
                 key={product.id}
                 className="flex flex-col bg-white dark:bg-gray-900 p-2 rounded-md relative border border-gray-200 dark:border-gray-600"
               >
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="h-[200px] w-auto mb-4 object-contain"
-                />
+                <Link to={`/product/${product.id}`}>
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="h-[200px] w-auto mb-4 object-contain"
+                  />
+                </Link>
                 <i className="text-2xl text-black dark:text-white cursor-pointer absolute bottom-[6rem] right-[1rem] hover:text-red-500">
                   <FiHeart />
                 </i>
