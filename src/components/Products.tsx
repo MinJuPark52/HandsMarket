@@ -25,7 +25,7 @@ const Products = () => {
   const currentProducts = productList.slice();
 
   return (
-    <div className="min-h-screen flex justify-center items-center px-4">
+    <div className="min-h-screen flex justify-center px-4">
       <div className="max-w-[1020px] mt-2">
         <h1 className="text-2xl mb-6 mt-2 font-semibold">
           회원님을 위한 추천 상품
@@ -41,7 +41,7 @@ const Products = () => {
                   <img
                     src={product.image}
                     alt={product.title}
-                    className="h-[200px] w-auto mb-4 object-contain"
+                    className="h-[200px] w-auto mb-4 object-contain mx-auto"
                   />
                 </Link>
                 <i className="text-2xl text-black dark:text-white cursor-pointer absolute bottom-[6rem] right-[1rem] hover:text-red-500">
