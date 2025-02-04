@@ -48,7 +48,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="relative ">
+    <div className="bottom-[3rem] relative ">
       <div className="max-w-[1020px] mx-auto flex items-center p-3">
         <button className="mr-4 text-[#626262] text-4xl" onClick={handleGoBack}>
           <FiChevronLeft />
