@@ -3,7 +3,12 @@ import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import App from "./App.tsx";
 import Login from "./pages/login.tsx";
 import Signup from "./pages/signup.tsx";
@@ -19,7 +24,6 @@ const root = ReactDOM.createRoot(
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  // 브라우저의 다크 모드 기본 설정을 감지하여 상태를 업데이트
   useEffect(() => {
     if (
       window.matchMedia &&
@@ -29,7 +33,6 @@ const Index = () => {
     }
   }, []);
 
-  // 다크 모드 상태가 변경되면 HTML 엘리먼트에 클래스 추가/삭제
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
@@ -40,8 +43,25 @@ const Index = () => {
 
   return (
     <Router>
-      {/* Nav에 다크 모드 상태와 상태 변경 함수 전달 */}
-      <Nav isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+      <RoutesWrapper isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+    </Router>
+  );
+};
+
+const RoutesWrapper = ({
+  isDarkMode,
+  setIsDarkMode,
+}: {
+  isDarkMode: boolean;
+  setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const location = useLocation();
+
+  return (
+    <>
+      {location.pathname !== "/search" && (
+        <Nav isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+      )}
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
@@ -50,7 +70,7 @@ const Index = () => {
         <Route path="/search" element={<Search />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>
-    </Router>
+    </>
   );
 };
 
