@@ -1,21 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiUser,
   FiShoppingCart,
   FiHeart,
   FiSearch,
   FiMoon,
   FiSun,
+  FiUser,
+  FiLogOut,
 } from "react-icons/fi";
 
 interface NavProps {
   isDarkMode: boolean;
   setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoggedIn: boolean;
 }
 
 const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+
+  const toggleLoginStatus = () => {
+    setIsLoggedIn((prev) => !prev);
+  };
 
   return (
     <>
@@ -28,28 +35,32 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
 
         <div className="flex justify-between gap-2">
           <button
-            onClick={() => navigate("/login")}
-            aria-label="로그인"
+            onClick={toggleLoginStatus}
+            aria-label={isLoggedIn ? "로그아웃" : "로그인"}
             className="text-black dark:text-white text-[1.56rem] leading-8 cursor-pointer m-[10px]"
           >
-            <FiUser />
+            {isLoggedIn ? <FiLogOut /> : <FiUser />}{" "}
           </button>
 
-          <button
-            onClick={() => navigate("/")}
-            aria-label="찜 목록"
-            className="text-black dark:text-white text-[1.56rem] leading-8 cursor-pointer m-[10px]"
-          >
-            <FiHeart />
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={() => navigate("/")}
+              aria-label="찜 목록"
+              className="text-black dark:text-white text-[1.56rem] leading-8 cursor-pointer m-[10px]"
+            >
+              <FiHeart />
+            </button>
+          )}
 
-          <button
-            onClick={() => navigate("/cart")}
-            aria-label="장바구니"
-            className="text-black dark:text-white text-[1.56rem] leading-8 cursor-pointer m-[10px]"
-          >
-            <FiShoppingCart />
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={() => navigate("/cart")}
+              aria-label="장바구니"
+              className="text-black dark:text-white text-[1.56rem] leading-8 cursor-pointer m-[10px]"
+            >
+              <FiShoppingCart />
+            </button>
+          )}
 
           <button
             onClick={() => navigate("/search")}

@@ -87,7 +87,7 @@ const ProducDetailPage = () => {
           </p>
 
           {showOptions && (
-            <div className="bottom-[2px] w-[1000px] h-[25rem] absolute border bg-[#fafafa] rounded-lg p-6">
+            <div className="bottom-[4.5rem] w-[1000px] h-[25rem] absolute border bg-[#fafafa] rounded-lg p-6">
               <div>
                 <p className="mb-1 text-lg">색상</p>
                 <select className="border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
@@ -106,8 +106,8 @@ const ProducDetailPage = () => {
                   <option value="L">L</option>
                 </select>
               </div>
-              <hr className="mt-[4rem]" />
-              <p className="ml-[53rem] mt-[1rem] text-2xl font-bold">
+              <hr className="flex mt-[4rem]" />
+              <p className="flex ml-[53rem] mt-[1rem] text-2xl font-bold">
                 총 ${product.price}
               </p>
             </div>
