@@ -16,6 +16,7 @@ import Cart from "./pages/nav/cart.tsx";
 import Search from "./pages/nav/search.tsx";
 import ProductDetail from "./pages/nav/detail.tsx";
 import Nav from "./components/UI/Nav.tsx";
+import Wish from "./pages/nav/wish.tsx";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -67,6 +68,7 @@ const RoutesWrapper = ({
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/wish" element={<Wish />} />
         <Route path="/search" element={<Search />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>

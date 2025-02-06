@@ -40,7 +40,7 @@ const ProducDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex justify-center px-4 mt-20">
+    <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
       <div className="w-[1020px] mt-2">
         <div className="flex justify-center">
           <img

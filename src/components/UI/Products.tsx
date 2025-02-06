@@ -22,6 +22,15 @@ const Products = () => {
       .catch((error) => console.error("Error loading product data:", error));
   }, []);
 
+  const handleAddToWishlist = (product: Product) => {
+    let wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+    if (!wishlist.find((item: Product) => item.id === product.id)) {
+      wishlist.push(product);
+      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    }
+    alert("🤍 찜한 상품에 추가했습니다");
+  };
+
   const currentProducts = productList.slice();
 
   return (
@@ -44,7 +53,10 @@ const Products = () => {
                     className="h-[200px] w-auto mb-4 object-contain mx-auto"
                   />
                 </Link>
-                <i className="text-2xl text-black dark:text-white cursor-pointer absolute bottom-[6rem] right-[1rem] hover:text-red-500">
+                <i
+                  className="text-2xl text-black dark:text-white cursor-pointer absolute bottom-[6rem] right-[1rem] hover:text-red-500"
+                  onClick={() => handleAddToWishlist(product)}
+                >
                   <FiHeart />
                 </i>
                 <p className="text-left font-semibold">{product.title}</p>
