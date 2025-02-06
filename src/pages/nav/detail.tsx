@@ -32,7 +32,25 @@ const ProducDetailPage = () => {
   };
 
   const handleCartClick = () => {
-    console.log("Add Cart");
+    if (!product) {
+      console.log("No product available.");
+      return;
+    }
+
+    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const isProductInCart = existingCart.some(
+      (item: Product) => item.id === product.id
+    );
+
+    if (!isProductInCart) {
+      existingCart.push(product);
+      localStorage.setItem("cart", JSON.stringify(existingCart));
+      alert("장바구니에 추가되었습니다");
+    } else {
+      console.log("Product already in cart");
+    }
+
+    console.log("Added to cart", product);
   };
 
   if (!product) {
