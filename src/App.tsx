@@ -1,6 +1,6 @@
-import Footer from "./components/Footer.tsx";
-import Products from "./components/Products.tsx";
-import Slide from "./components/Slide.tsx";
+import Footer from "./components/UI/Footer.tsx";
+import Products from "./components/UI/Products.tsx";
+import Slide from "./components/UI/Slide.tsx";
 
 const App = () => {
   return (
