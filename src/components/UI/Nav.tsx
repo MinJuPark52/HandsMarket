@@ -36,7 +36,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
           </button>
 
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/wish")}
             aria-label="찜 목록"
             className="text-black dark:text-white text-[1.56rem] leading-8 cursor-pointer m-[10px]"
           >
