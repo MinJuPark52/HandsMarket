@@ -50,7 +50,10 @@ const SearchPage = () => {
   return (
     <div className="bottom-[3rem] relative mt-[3rem]">
       <div className="max-w-[1020px] mx-auto flex items-center p-3">
-        <button className="mr-4 text-[#626262] text-4xl" onClick={handleGoBack}>
+        <button
+          className="mr-4 text-[#626262] text-4xl dark:text-white"
+          onClick={handleGoBack}
+        >
           <FiChevronLeft />
         </button>
         <div className="flex items-center w-full relative">

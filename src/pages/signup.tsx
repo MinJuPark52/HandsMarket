@@ -41,7 +41,7 @@ const SignupPage = () => {
   return (
     <div className="mt-[4rem]">
       <form onSubmit={loginSubmit} className="p-12 w-[90%] text-center">
-        <h1 className="text-3xl font-medium">Sign Up</h1>
+        <h1 className="text-3xl font-medium dark:text-white">Sign Up</h1>
         <br />
         <div>
           <input
@@ -51,7 +51,7 @@ const SignupPage = () => {
             value={loginState.id}
             onChange={(e) => setError("id", e.target.value)}
           />
-          <span className="mx-2">@</span>
+          <span className="mx-2 dark:text-white">@</span>
           <select
             className="p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             value={loginState.emailDomain}

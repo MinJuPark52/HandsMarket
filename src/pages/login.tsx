@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="mt-[5rem]">
       <form className="p-12 w-[90%] text-center" onSubmit={loginSubmit}>
-        <h1 className="text-3xl font-medium">Login</h1>
+        <h1 className="text-3xl font-medium dark:text-white">Login</h1>
         <br />
         <div>
           <input
@@ -70,7 +70,7 @@ const LoginPage: React.FC = () => {
         >
           로그인
         </button>
-        <div className="text-gray-500 text-sm no-underline mt-4 mb-4">
+        <div className="dark:text-white text-gray-500 text-sm no-underline mt-4 mb-4">
           <span className="px-2">아직 회원이 아니신가요?</span>
           <Link to="/signup">회원가입</Link>
         </div>
