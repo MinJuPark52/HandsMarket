@@ -8,6 +8,24 @@ body {
   font-family: "Noto Sans", "Roboto", sans-serif;
 }
 
+/* 시스템에 설정에 따라 자동 */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+    color: white;
+  }
+
+  html {
+    background-color: #2d3748;
+  }
+}
+
+/* 수동 다크모드 */
 html.dark {
   background-color: #2d3748;
+}
+
+html.dark body {
+  background-color: black;
+  color: white;
 }

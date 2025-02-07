@@ -104,34 +104,46 @@ const ProducDetailPage = () => {
             </p>
           </p>
 
-          {showOptions && (
-            <div className="bottom-[4.5rem] w-[1000px] h-[25rem] absolute border bg-[#fafafa] rounded-lg p-6">
-              <div>
-                <p className="mb-1 text-lg">색상</p>
-                <select className="border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
-                  <option value="">색상을 선택하기</option>
-                  <option value="블랙">블랙</option>
-                  <option value="네이비">네이비</option>
-                  <option value="화이트">화이트</option>
-                </select>
+          <div className="relative">
+            {showOptions && (
+              <div className="dark:bg-gray-500 w-[988px] absolute -bottom-[2rem] transform translate-y-[0%] border bg-[#f1f1f1] rounded-lg p-6">
+                <div>
+                  <p className="mb-1 text-lg">색상</p>
+                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
+                    <option value="">색상을 선택하기</option>
+                    <option value="블랙">블랙</option>
+                    <option value="네이비">네이비</option>
+                    <option value="화이트">화이트</option>
+                  </select>
+                </div>
+                <div className="mt-4">
+                  <p className="mb-1 text-lg">사이즈</p>
+                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
+                    <option value="">사이즈를 선택하기</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                  </select>
+                </div>
+                <hr className="flex mt-[4rem]" />
+                <p className="dark:text-gray-800 flex ml-[53rem] mt-[1rem] text-2xl font-bold">
+                  총 ${product.price}
+                </p>
               </div>
-              <div className="mt-4">
-                <p className="mb-1 text-lg">사이즈</p>
-                <select className="border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
-                  <option value="">사이즈를 선택하기</option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                </select>
-              </div>
-              <hr className="flex mt-[4rem]" />
-              <p className="flex ml-[53rem] mt-[1rem] text-2xl font-bold">
-                총 ${product.price}
-              </p>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="mt-4 flex z-[1]">
+            {showOptions && (
+              <div className="flex">
+                <button
+                  onClick={handleCartClick}
+                  className="rounded-lg dark:bg-gray-600 bg-white text-black dark:text-white border h-[4rem] w-[510px]"
+                >
+                  장바구니
+                </button>
+              </div>
+            )}
             <button
               onClick={handleBuyClick}
               className={`rounded-lg bg-gray-800 text-white border px-2 h-[4rem] ${
@@ -140,16 +152,6 @@ const ProducDetailPage = () => {
             >
               구매하기
             </button>
-            {showOptions && (
-              <div className="flex">
-                <button
-                  onClick={handleCartClick}
-                  className="rounded-lg bg-gray-800 text-white border h-[4rem] w-[510px]"
-                >
-                  장바구니
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
