@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 import ReactDOM from "react-dom/client";
@@ -22,6 +23,8 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
+const queryClient = new QueryClient();
+
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
@@ -43,9 +46,11 @@ const Index = () => {
   }, [isDarkMode]);
 
   return (
-    <Router>
-      <RoutesWrapper isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <RoutesWrapper isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+      </Router>
+    </QueryClientProvider>
   );
 };
 

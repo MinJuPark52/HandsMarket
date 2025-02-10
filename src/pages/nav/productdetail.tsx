@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { IoShareSocialOutline } from "react-icons/io5";
+import { useQuery } from "@tanstack/react-query";
 
 interface Product {
   id: number;
@@ -10,32 +11,37 @@ interface Product {
   price: number;
 }
 
+const fetchProducts = async (): Promise<Product[]> => {
+  const response = await fetch("/products.json");
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+  return response.json();
+};
+
 const ProducDetailPage = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
   const [showOptions, setShowOptions] = useState(false);
 
-  useEffect(() => {
-    fetch(`/products.json`)
-      .then((response) => response.json())
-      .then((data) => {
-        const productDetail = data.find(
-          (item: Product) => item.id === Number(id)
-        );
-        setProduct(productDetail || null);
-      })
-      .catch((error) => console.error("Error loading product data:", error));
-  }, [id]);
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
-  const handleBuyClick = () => {
-    setShowOptions(true);
-  };
+  if (isLoading) return <p>Loading product...</p>;
+  if (error) return <p>Error loading product data.</p>;
+
+  const product = products?.find((item) => item.id === Number(id));
+  if (!product) return <p>Product not found.</p>;
+
+  const handleBuyClick = () => setShowOptions(true);
 
   const handleCartClick = () => {
-    if (!product) {
-      console.log("No product available.");
-      return;
-    }
+    if (!product) return;
 
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
     const isProductInCart = existingCart.some(
@@ -46,16 +52,8 @@ const ProducDetailPage = () => {
       existingCart.push(product);
       localStorage.setItem("cart", JSON.stringify(existingCart));
       alert("장바구니에 추가되었습니다");
-    } else {
-      console.log("Product already in cart");
     }
-
-    console.log("Added to cart", product);
   };
-
-  if (!product) {
-    return <p>Loading product...</p>;
-  }
 
   return (
     <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
@@ -126,7 +124,7 @@ const ProducDetailPage = () => {
                   </select>
                 </div>
                 <hr className="flex mt-[4rem]" />
-                <p className="dark:text-gray-800 flex ml-[53rem] mt-[1rem] text-2xl font-bold">
+                <p className="dark:text-gray-800 flex ml-[50rem] mt-[1rem] text-2xl font-bold">
                   총 ${product.price}
                 </p>
               </div>
