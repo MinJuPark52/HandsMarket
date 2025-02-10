@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LoginStore from "../../stores/loginStore";
 
 const LoginPage: React.FC = () => {
-  const [id, setId] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const { id, password, error, setId, setPassword, setError } = LoginStore();
   const navigate = useNavigate();
 
   const loginSubmit = (e: any) => {
