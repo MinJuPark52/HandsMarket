@@ -1,12 +1,15 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginStore from "../../stores/loginStore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import app from "../../../src/firebaseConfig.tsx";
 
 const LoginPage: React.FC = () => {
   const { id, password, error, setId, setPassword, setError } = LoginStore();
   const navigate = useNavigate();
+  const auth = getAuth(app);
 
-  const loginSubmit = (e: any) => {
+  const loginSubmit = async (e: any) => {
     e.preventDefault();
 
     const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
@@ -32,8 +35,26 @@ const LoginPage: React.FC = () => {
     }
 
     setError("");
-    alert("로그인 되었습니다.");
-    navigate("/");
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        id,
+        password
+      );
+      const user = userCredential.user;
+      console.log("로그인 성공:", user);
+      alert("로그인 되었습니다.");
+      navigate("/");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError("로그인에 실패했습니다. 다시 시도해 주세요.");
+        console.error("로그인 실패:", error.message);
+      } else {
+        setError("알 수 없는 오류가 발생했습니다.");
+        console.error("알 수 없는 오류:", error);
+      }
+    }
   };
 
   return (
