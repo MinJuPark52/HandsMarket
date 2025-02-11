@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginStore from "../../stores/loginStore";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import app from "../../../src/firebaseConfig.tsx";
+import app from "../../firebase/firebaseConfig";
 
 const LoginPage: React.FC = () => {
   const { id, password, error, setId, setPassword, setError } = LoginStore();
