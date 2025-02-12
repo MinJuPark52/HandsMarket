@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: number;
@@ -22,6 +23,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 const ProducDetailPage = () => {
   const { id } = useParams();
   const [showOptions, setShowOptions] = useState(false);
+  const navigate = useNavigate();
 
   const {
     data: products,
@@ -42,6 +44,14 @@ const ProducDetailPage = () => {
 
   const handleCartClick = () => {
     if (!product) return;
+
+    const isLoggedIn = Boolean(localStorage.getItem("userToken"));
+
+    if (isLoggedIn) {
+      navigate("/cart");
+    } else {
+      navigate("/login");
+    }
 
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
     const isProductInCart = existingCart.some(
