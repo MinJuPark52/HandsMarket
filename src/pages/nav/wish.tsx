@@ -27,7 +27,7 @@ const WishList = () => {
     <div className="dark:text-white min-h-screen flex justify-center px-4 mt-[5rem]">
       <div className="max-w-[1020px] mt-2">
         {wishlist.length > 0 && (
-          <h1 className="text-2xl mb-6 mt-2 font-semibold">찜한 상품</h1>
+          <h1 className="text-2xl mb-4 mt-2 ml-1 font-semibold">찜한 상품</h1>
         )}
         <div className="grid grid-cols-[repeat(4,_1fr)] gap-2">
           {wishlist.length > 0 ? (

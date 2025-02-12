@@ -1,5 +1,5 @@
 import { FiHeart } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 interface Product {
@@ -19,6 +19,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 };
 
 const Products = () => {
+  const navigate = useNavigate();
   const {
     data: productList,
     isLoading,
@@ -28,13 +29,20 @@ const Products = () => {
     queryFn: fetchProducts,
   });
 
+  const isLoggedIn = localStorage.getItem("user");
+
   const handleAddToWishlist = (product: Product) => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
     let wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
     if (!wishlist.find((item: Product) => item.id === product.id)) {
       wishlist.push(product);
       localStorage.setItem("wishlist", JSON.stringify(wishlist));
     }
-    alert("🤍 찜한 상품에 추가했습니다");
+    alert("찜한 상품에 추가했습니다");
+    navigate("/wishlist");
   };
 
   if (isLoading)

@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
-import { FaRegTrashCan } from "react-icons/fa6";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { IoShareSocialOutline } from "react-icons/io5";
+import { useQuery } from "@tanstack/react-query";
 
 interface Product {
   id: number;
@@ -7,104 +9,160 @@ interface Product {
   title: string;
   description: string;
   price: number;
-  quantity: number;
 }
 
-const Cart = () => {
-  const [cart, setCart] = useState<Product[]>([]);
+const fetchProducts = async (): Promise<Product[]> => {
+  const response = await fetch("/products.json");
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+  return response.json();
+};
 
-  useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartWithQuantity = savedCart.map((item: Product) => ({
-      ...item,
-      quantity: item.quantity || 1,
-    }));
-    setCart(cartWithQuantity);
-  }, []);
+const ProducDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [showOptions, setShowOptions] = useState(false);
 
-  const handleRemoveFromCart = (id: number) => {
-    const updatedCart = cart.filter((item) => item.id !== id);
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
-  const handleQuantityChange = (id: number, delta: number) => {
-    const updatedCart = cart.map((item) =>
-      item.id === id
-        ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
-        : item
+  if (isLoading) return <p>Loading product...</p>;
+  if (error) return <p>Error loading product data.</p>;
+
+  const product = products?.find((item) => item.id === Number(id));
+  if (!product) return <p>Product not found.</p>;
+
+  const handleBuyClick = () => setShowOptions(true);
+
+  const handleCartClick = () => {
+    if (!product) return;
+
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (isLoggedIn) {
+      navigate("/cart");
+    } else {
+      navigate("/login");
+    }
+
+    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const isProductInCart = existingCart.some(
+      (item: Product) => item.id === product.id
     );
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
 
-  const totalAmount = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+    if (!isProductInCart) {
+      existingCart.push(product);
+      localStorage.setItem("cart", JSON.stringify(existingCart));
+      alert("장바구니에 추가되었습니다");
+    }
+  };
 
   return (
-    <div className="dark:text-white min-h-screen flex justify-center px-4 mt-[5rem]">
+    <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
       <div className="w-[1020px] mt-2">
-        {cart.length > 0 && (
-          <h1 className="text-2xl font-semibold mb-2">장바구니</h1>
-        )}
-        {cart.length > 0 ? (
+        <div className="flex justify-center">
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-[30rem] w-auto object-contain"
+          />
+        </div>
+
+        <div className="p-4 flex flex-col">
+          <div className="w-full h-auto flex justify-between items-center">
+            <h2 className="mb-2 text-xl font-semibold">{product.title}</h2>
+            <IoShareSocialOutline className="text-xl" />
+          </div>
+
+          <p>{product.description}</p>
+          <p className="text-lg font-semibold mt-2">
+            <span>판매가</span>
+            <span className="ml-8">$</span>
+            {product.price}
+            <hr className="mt-2" />
+          </p>
+
           <div>
-            {cart.map((product) => (
-              <div
-                key={product.id}
-                className="flex justify-between items-center p-4 border-b"
-              >
-                <div className="flex items-center">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="h-[6rem] w-auto object-contain mr-4"
-                  />
-                  <div>
-                    <p className="text-xl font-semibold">{product.title}</p>
-                    <p className="text-lg">${product.price}</p>
-                  </div>
+            <select className="border px-2 w-full h-[4rem] mt-2 text-blue-500">
+              <option className="text-gray-700">할인 쿠폰 받기</option>
+              <option className="text-gray-700">첫구매 20% 할인 쿠폰</option>
+              <option className="text-gray-700">
+                즐겨찾기 할인 쿠폰 1000원
+              </option>
+            </select>
+          </div>
+          <p className="mt-4">
+            <span>배송정보</span>
+            <span className="ml-8">무료 배송</span>
+          </p>
 
-                  {/* 카운트 */}
-                  <div className="flex items-center space-x-6 ml-[3rem]">
-                    <button
-                      onClick={() => handleQuantityChange(product.id, -1)}
-                      className="px-2 py-1 bg-gray-200 dark:bg-slate-500 rounded"
-                    >
-                      -
-                    </button>
-                    <span className="text-lg">{product.quantity}</span>
-                    <button
-                      onClick={() => handleQuantityChange(product.id, 1)}
-                      className="px-2 py-1 bg-gray-200 dark:bg-slate-500 rounded"
-                    >
-                      +
-                    </button>
-                  </div>
+          <p className="mt-2">
+            <span>도착예정</span>
+            <span className="ml-8">도착 확률 95%</span>
+            <p className="mt-1 text-gray-400">
+              *배송 출발 이후 배송 기간은 2-3일 소요됩니다
+            </p>
+          </p>
+
+          <div className="relative">
+            {showOptions && (
+              <div className="dark:bg-gray-500 w-[988px] absolute -bottom-[2rem] transform translate-y-[0%] border bg-[#f1f1f1] rounded-lg p-6">
+                <div>
+                  <p className="mb-1 text-lg">색상</p>
+                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
+                    <option value="">색상을 선택하기</option>
+                    <option value="블랙">블랙</option>
+                    <option value="네이비">네이비</option>
+                    <option value="화이트">화이트</option>
+                  </select>
                 </div>
+                <div className="mt-4">
+                  <p className="mb-1 text-lg">사이즈</p>
+                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
+                    <option value="">사이즈를 선택하기</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                  </select>
+                </div>
+                <hr className="flex mt-[4rem]" />
+                <p className="dark:text-gray-800 flex ml-[50rem] mt-[1rem] text-2xl font-bold">
+                  총 ${product.price}
+                </p>
+              </div>
+            )}
+          </div>
 
+          <div className="mt-4 flex z-[1]">
+            {showOptions && (
+              <div className="flex">
                 <button
-                  onClick={() => handleRemoveFromCart(product.id)}
-                  className="text-red-500"
+                  onClick={handleCartClick}
+                  className="rounded-lg dark:bg-gray-600 bg-white text-black dark:text-white border h-[4rem] w-[510px]"
                 >
-                  <FaRegTrashCan className="w-[22px] h-auto" />
+                  장바구니
                 </button>
               </div>
-            ))}
-            <div className="mt-4 text-right">
-              <p className="text-xl font-semibold">총 금액: ${totalAmount}</p>
-            </div>
+            )}
+            <button
+              onClick={handleBuyClick}
+              className={`rounded-lg bg-gray-800 text-white border px-2 h-[4rem] ${
+                showOptions ? "ml-2 w-[510px]" : "w-full"
+              }`}
+            >
+              구매하기
+            </button>
           </div>
-        ) : (
-          <p className="dark:text-white mt-[2rem] col-span-3 text-center text-lg">
-            장바구니에 담긴 상품이 없습니다.
-          </p>
-        )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Cart;
+export default ProducDetailPage;
