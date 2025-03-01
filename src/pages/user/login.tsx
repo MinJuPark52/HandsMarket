@@ -2,13 +2,13 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginStore from "../../stores/loginStore";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseConfig } from "../../firebase/firebaseConfig.tsx";
+import { firebaseconfig } from "../../firebase/firebaseconfig.tsx";
 import { initializeApp } from "firebase/app";
 
 const LoginPage: React.FC = () => {
   const { id, password, error, setId, setPassword, setError } = LoginStore();
   const navigate = useNavigate();
-  const app = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseconfig);
   const auth = getAuth(app);
 
   const loginSubmit = async (e: any) => {
