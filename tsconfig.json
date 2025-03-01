@@ -8,10 +8,7 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "baseUrl": "src",
-    "paths": {
-      "firebaseConfig": ["firebase/firebaseConfig"]
-    },
-    "jsx": "preserve",
+    "jsx": "react",
     "noEmit": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
