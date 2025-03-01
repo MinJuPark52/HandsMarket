@@ -10,14 +10,14 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import App from "./App.tsx";
-import Login from "./pages/user/login.tsx";
-import Signup from "./pages/user/signup.tsx";
-import Cart from "./pages/nav/cart.tsx";
-import Search from "./pages/nav/search.tsx";
-import ProductDetail from "./pages/nav/productdetail.tsx";
-import Nav from "./components/UI/Nav.tsx";
-import Wish from "./pages/nav/wish.tsx";
+import App from "./App";
+import Login from "./pages/user/login";
+import Signup from "./pages/user/signup";
+import Cart from "./pages/nav/cart";
+import Search from "./pages/nav/search";
+import ProductDetail from "./pages/nav/productdetail";
+import Nav from "./components/UI/Nav";
+import Wish from "./pages/nav/wish";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
