@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginStore from "../../stores/loginStore";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseconfig } from "../../firebase/firebaseconfig";
+import { firebaseconfig } from "../../../firebaseconfig";
 import { initializeApp } from "firebase/app";
 
 const LoginPage: React.FC = () => {
