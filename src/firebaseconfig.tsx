@@ -1,17 +1,9 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-
-const firebaseconfig = {
+export const firebaseconfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+  authDomain: "eshop-e614e.firebaseapp.com",
+  projectId: "eshop-e614e",
+  storageBucket: "eshop-e614e.firebasestorage.app",
+  messagingSenderId: "272954111023",
+  appId: "1:272954111023:web:351cec4312189ed68e82da",
+  measurementId: "G-4KXN3S2QKC",
 };
-
-const app = initializeApp(firebaseconfig);
-const auth = getAuth(app);
-
-export { auth };
