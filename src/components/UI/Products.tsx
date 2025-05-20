@@ -1,9 +1,11 @@
 import { FiHeart } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { db } from "../../firebase/firebaseConfig";
+import { collection, getDocs } from "firebase/firestore";
 
 interface Product {
-  id: number;
+  id: string;
   image: string;
   title: string;
   description: string;
@@ -11,11 +13,12 @@ interface Product {
 }
 
 const fetchProducts = async (): Promise<Product[]> => {
-  const response = await fetch("/products.json");
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
-  }
-  return response.json();
+  const querySnapshot = await getDocs(collection(db, "product")); // 'product' 컬렉션에서 데이터를 가져옴
+  const products: Product[] = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Product[];
+  return products;
 };
 
 const Products = () => {
@@ -53,33 +56,38 @@ const Products = () => {
     return <p className="text-center text-lg">No products available.</p>;
 
   return (
-    <div className="min-h-screen flex justify-center px-4">
-      <div className="max-w-[1020px] mt-2">
-        <h1 className="text-2xl mb-6 mt-2 font-semibold">
+    <div className="flex justify-center">
+      <div className="mt-2 mx-auto w-full min-w-[600px] max-w-[1024px]">
+        <h1 className="text-2xl mb-4 mt-2 font-semibold">
           회원님을 위한 추천 상품
         </h1>
         <div className="grid grid-cols-[repeat(4,_1fr)] gap-2">
-          {productList.map((product) => (
+          {productList.map((product: Product) => (
             <div
               key={product.id}
-              className="flex flex-col bg-white dark:bg-gray-900 p-2 rounded-md relative border border-gray-200 dark:border-gray-600"
+              className="flex flex-col bg-white rounded-lg relative border border-gray-200"
             >
               <Link to={`/product/${product.id}`}>
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="h-[200px] w-auto mb-4 object-contain mx-auto"
+                  className="h-[150px] w-full mb-2 object-contain mx-auto"
                 />
               </Link>
               <i
-                className="text-2xl text-black dark:text-white cursor-pointer absolute bottom-[6rem] right-[1rem] hover:text-red-500"
+                className="absolute bottom-[60px] right-[15px] cursor-pointer"
                 onClick={() => handleAddToWishlist(product)}
               >
-                <FiHeart />
+                <div className="bg-gray-100 dark:bg-gray-500 rounded-full p-2">
+                  <FiHeart className="text-2xl text-black dark:text-white hover:text-red-500" />
+                </div>
               </i>
-              <p className="text-left font-semibold">{product.title}</p>
-              <p className="text-left dark:text-white">{product.description}</p>
-              <p className="text-left font-semibold">${product.price}</p>
+              <p className="px-2 pt-1 text-left text-lg dark:text-black">
+                {product.title}
+              </p>
+              <p className="px-2 pb-1 text-left font-semibold text-lg dark:text-black">
+                {product.price.toLocaleString("ko-KR")}원
+              </p>
             </div>
           ))}
         </div>

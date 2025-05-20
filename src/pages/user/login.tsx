@@ -1,15 +1,10 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginStore from "../../stores/loginStore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseConfig } from "../../firebase/firebaseconfig";
-import { initializeApp } from "firebase/app";
 
 const LoginPage: React.FC = () => {
   const { id, password, error, setId, setPassword, setError } = LoginStore();
   const navigate = useNavigate();
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
 
   const loginSubmit = async (e: any) => {
     e.preventDefault();
@@ -39,13 +34,6 @@ const LoginPage: React.FC = () => {
     setError("");
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        id,
-        password
-      );
-      const user = userCredential.user;
-      console.log("로그인 성공:", user);
       alert("로그인 되었습니다.");
       navigate("/");
     } catch (error: unknown) {
@@ -61,7 +49,10 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="mt-[5rem]">
-      <form className="p-12 w-[90%] text-center" onSubmit={loginSubmit}>
+      <form
+        className="mx-auto w-full max-w-[1024px] my-[10px] p-12 w-[100%] text-center"
+        onSubmit={loginSubmit}
+      >
         <h1 className="text-3xl font-medium dark:text-white">Login</h1>
         <br />
         <div>
@@ -87,7 +78,7 @@ const LoginPage: React.FC = () => {
 
         {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
         <button
-          className="mt-2 w-[610px] p-3 bg-blue-500 text-white text-base rounded-md cursor-pointer hover:bg-blue-700"
+          className="mt-2 w-[600px] p-3 bg-blue-500 text-white text-base rounded-md cursor-pointer hover:bg-blue-700"
           type="submit"
         >
           로그인

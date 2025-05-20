@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import useSignupStore from "../../stores/signupStore";
+import { auth } from "../../firebase/firebaseConfig";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const SignupPage = () => {
   const {
@@ -17,7 +19,7 @@ const SignupPage = () => {
 
   const navigate = useNavigate();
 
-  const loginSubmit = (e: any) => {
+  const loginSubmit = async (e: any) => {
     e.preventDefault();
 
     if (!id) {
@@ -32,26 +34,47 @@ const SignupPage = () => {
       setError("닉네임: 필수 정보입니다.");
     } else {
       resetError();
-      console.log("가입 정보:", { id, password, nickname });
-      alert("회원가입을 완료했습니다.");
-      navigate("/");
+      const fullEmail = `${id}${emailDomain}`;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          fullEmail,
+          password
+        );
+        const user = userCredential.user;
+
+        // 닉네임 설정
+        await updateProfile(user, {
+          displayName: nickname,
+        });
+
+        alert("회원가입을 완료했습니다.");
+        navigate("/");
+      } catch (error: any) {
+        // Firebase 에러 메시지 출력
+        setError(`회원가입 오류: ${error.message}`);
+      }
     }
   };
 
   return (
     <div className="mt-[4rem]">
-      <form onSubmit={loginSubmit} className="p-12 w-[90%] text-center">
+      <form
+        onSubmit={loginSubmit}
+        className="mx-auto w-full max-w-[1024px] my-[10px] p-12 w-[100%] p-12 text-center"
+      >
         <h1 className="text-3xl font-medium dark:text-white">Sign Up</h1>
         <br />
         <div>
           <input
-            className="w-[430px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[420px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="이메일"
             type="text"
             value={id}
             onChange={(e) => setField("id", e.target.value)}
           />
-          <span className="mx-2 dark:text-white">@</span>
+          <span className="p-2 mx-2 dark:text-white">@</span>
           <select
             className="p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             value={emailDomain}
@@ -92,7 +115,7 @@ const SignupPage = () => {
         </div>
         {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
         <button
-          className="mt-2 w-[610px] p-3 bg-blue-500 text-white text-base rounded-md cursor-pointer transition-colors duration-300 hover:bg-blue-700"
+          className="mt-2 w-[600px] p-3 bg-blue-500 text-white text-base rounded-md cursor-pointer transition-colors duration-300 hover:bg-blue-700"
           type="submit"
         >
           회원가입
