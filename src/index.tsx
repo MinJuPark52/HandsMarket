@@ -17,7 +17,8 @@ import Cart from "./pages/nav/cart";
 import Search from "./pages/nav/search";
 import ProductDetail from "./pages/nav/productdetail";
 import Nav from "./components/UI/Nav";
-import Wish from "./pages/nav/wish";
+import Wish from "./pages/myPage/wish";
+import Profile from "pages/myPage/profile";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -74,6 +75,7 @@ const RoutesWrapper = ({
         <Route path="/signup" element={<Signup />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/wish" element={<Wish />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<Search />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>

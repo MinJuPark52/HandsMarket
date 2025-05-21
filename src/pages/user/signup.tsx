@@ -44,7 +44,6 @@ const SignupPage = () => {
         );
         const user = userCredential.user;
 
-        // 닉네임 설정
         await updateProfile(user, {
           displayName: nickname,
         });
@@ -52,7 +51,6 @@ const SignupPage = () => {
         alert("회원가입을 완료했습니다.");
         navigate("/");
       } catch (error: any) {
-        // Firebase 에러 메시지 출력
         setError(`회원가입 오류: ${error.message}`);
       }
     }

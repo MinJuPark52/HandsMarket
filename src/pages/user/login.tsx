@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginStore from "../../stores/loginStore";
 
 const LoginPage: React.FC = () => {
-  const { id, password, error, setId, setPassword, setError } = LoginStore();
+  const { id, password, error, setId, setPassword, setError, setIsLoggedIn } =
+    LoginStore();
   const navigate = useNavigate();
 
   const loginSubmit = async (e: any) => {
@@ -24,8 +25,7 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{6,12}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{6,12}$/;
     if (!passwordRegex.test(password)) {
       setError("비밀번호는 특수문자, 대소문자, 숫자를 포함하여 입력해주세요");
       return;
@@ -34,7 +34,8 @@ const LoginPage: React.FC = () => {
     setError("");
 
     try {
-      alert("로그인 되었습니다.");
+      setIsLoggedIn(true);
+      alert("로그인되었습니다.");
       navigate("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
