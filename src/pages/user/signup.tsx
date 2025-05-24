@@ -60,13 +60,17 @@ const SignupPage = () => {
     <div className="mt-[4rem]">
       <form
         onSubmit={loginSubmit}
-        className="mx-auto w-full max-w-[1024px] my-[10px] p-12 w-[100%] p-12 text-center"
+        className="mx-auto w-full max-w-[1024px] text-center my-[10px] py-4"
       >
-        <h1 className="text-3xl font-medium dark:text-white">Sign Up</h1>
-        <br />
+        <div className="w-full max-w-[600px] mx-auto text-left">
+          <div className="dark:text-white text-sm no-underline mb-4">
+            <h1 className="text-3xl font-semibold dark:text-white">SignUp</h1>
+          </div>
+        </div>
+
         <div>
           <input
-            className="w-[420px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[420px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="이메일"
             type="text"
             value={id}
@@ -74,7 +78,7 @@ const SignupPage = () => {
           />
           <span className="p-2 mx-2 dark:text-white">@</span>
           <select
-            className="p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="p-2 h-[50px] my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             value={emailDomain}
             onChange={(e) => setField("emailDomain", e.target.value)}
           >
@@ -86,7 +90,7 @@ const SignupPage = () => {
         </div>
         <div>
           <input
-            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="비밀번호"
             type="password"
             value={password}
@@ -95,7 +99,7 @@ const SignupPage = () => {
         </div>
         <div>
           <input
-            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="비밀번호 재입력"
             type="password"
             value={passwordAgain}
@@ -104,7 +108,7 @@ const SignupPage = () => {
         </div>
         <div>
           <input
-            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="닉네임"
             type="text"
             value={nickname}
@@ -113,7 +117,7 @@ const SignupPage = () => {
         </div>
         {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
         <button
-          className="mt-2 w-[600px] p-3 bg-blue-500 text-white text-base rounded-md cursor-pointer transition-colors duration-300 hover:bg-blue-700"
+          className="mt-2 w-[600px] h-[50px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600"
           type="submit"
         >
           회원가입

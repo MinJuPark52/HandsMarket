@@ -19,9 +19,9 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
   const isLoggedIn = LoginStore((state) => state.isLoggedIn);
 
   return (
-    <div className="max-w-[1024px] mx-auto flex justify-between items-center p-4 fixed top-0 left-0 right-0 z-[1000] bg-[#f3f3f3] dark:bg-gray-800 text-black dark:text-white">
+    <div className="max-w-[1024px] mx-auto flex justify-between items-center py-4 fixed top-0 left-0 right-0 z-[1000] bg-[#ffffff] dark:bg-gray-800 text-black dark:text-white">
       <div className="flex items-center relative">
-        <p className="font-bold text-2xl text-gray-800 dark:text-white italic">
+        <p className="text-orange-500 font-bold text-2xl dark:text-white italic">
           <Link to="/">HandsMarket</Link>
         </p>
       </div>

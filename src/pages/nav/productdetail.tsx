@@ -1,44 +1,86 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { IoShareSocialOutline } from "react-icons/io5";
+import { FiHeart } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
+
+interface ProductOptionValue {
+  label: string;
+  price: number;
+}
+
+interface ProductOption {
+  name: string;
+  label: string;
+  values: ProductOptionValue[];
+}
 
 interface Product {
-  id: number;
+  id: string;
   image: string;
   title: string;
   description: string;
   price: number;
+  options?: ProductOption[];
 }
 
-const fetchProducts = async (): Promise<Product[]> => {
-  const response = await fetch("/products.json");
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
+const fetchProductById = async (id: string): Promise<Product | null> => {
+  const docRef = doc(db, "product", id);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as Partial<Product>;
+
+    return {
+      id: docSnap.id,
+      image: data.image ?? "",
+      title: data.title ?? "",
+      description: data.description ?? "",
+      price: Number(data.price ?? 0),
+      options: data.options ?? [],
+    };
   }
-  return response.json();
+
+  return null;
 };
 
 const ProducDetailPage = () => {
   const { id } = useParams();
-  const [showOptions, setShowOptions] = useState(false);
   const navigate = useNavigate();
+  const [showOptions, setShowOptions] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<{
+    [key: string]: ProductOptionValue;
+  }>({});
+
+  const handleOptionChange = (optionName: string, valueLabel: string) => {
+    const option = product?.options?.find((o) => o.name === optionName);
+    const value = option?.values.find((v) => v.label === valueLabel);
+    if (value) {
+      setSelectedOptions((prev) => ({ ...prev, [optionName]: value }));
+    }
+  };
+
+  const calculateTotalPrice = () => {
+    const basePrice = product?.price || 0;
+    const extra = Object.values(selectedOptions).reduce(
+      (sum, opt) => sum + opt.price,
+      0
+    );
+    return basePrice + extra;
+  };
 
   const {
-    data: products,
+    data: product,
     isLoading,
     error,
-  } = useQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+  } = useQuery<Product | null>({
+    queryKey: ["product", id],
+    queryFn: () => fetchProductById(id!),
+    enabled: !!id,
   });
-
-  if (isLoading) return <p>Loading product...</p>;
-  if (error) return <p>Error loading product data.</p>;
-
-  const product = products?.find((item) => item.id === Number(id));
-  if (!product) return <p>Product not found.</p>;
 
   const handleBuyClick = () => setShowOptions(true);
 
@@ -46,11 +88,9 @@ const ProducDetailPage = () => {
     if (!product) return;
 
     const isLoggedIn = Boolean(localStorage.getItem("userToken"));
-
-    if (isLoggedIn) {
-      navigate("/cart");
-    } else {
+    if (!isLoggedIn) {
       navigate("/login");
+      return;
     }
 
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -63,35 +103,42 @@ const ProducDetailPage = () => {
       localStorage.setItem("cart", JSON.stringify(existingCart));
       alert("장바구니에 추가되었습니다");
     }
+
+    navigate("/cart");
   };
+
+  if (isLoading) return <p>Loading product...</p>;
+  if (error || !product) return <p>Product not found or error occurred.</p>;
 
   return (
     <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
-      <div className="w-[1020px] mt-2">
-        <div className="flex justify-center">
+      <div className="w-[1024x] flex gap-2">
+        <div className="w-[500px] h-[600px]">
           <img
             src={product.image}
             alt={product.title}
-            className="h-[30rem] w-auto object-contain"
+            className="w-full h-full object-cover"
           />
         </div>
 
-        <div className="p-4 flex flex-col">
+        <div className="w-[512px] p-4 flex flex-col">
           <div className="w-full h-auto flex justify-between items-center">
-            <h2 className="mb-2 text-xl font-semibold">{product.title}</h2>
-            <IoShareSocialOutline className="text-xl" />
+            <h2 className="mb-2 text-xl">{product.title}</h2>
+            <div className="flex gap-2 ml-auto">
+              <FiHeart className="text-2xl" />
+              <IoShareSocialOutline className="text-2xl ml-2" />
+            </div>
           </div>
 
           <p>{product.description}</p>
-          <p className="text-lg font-semibold mt-2">
-            <span>판매가</span>
-            <span className="ml-8">$</span>
+          <p className="text-xl font-semibold mt-2">
             {product.price}
-            <hr className="mt-2" />
+            <span className="font-light">원</span>
           </p>
+          <hr className="mt-2" />
 
           <div>
-            <select className="border px-2 w-full h-[4rem] mt-2 text-blue-500">
+            <select className="border p-2 text-lg w-full h-[4rem] mt-2 text-orange-500 rounded-lg">
               <option className="text-gray-700">할인 쿠폰 받기</option>
               <option className="text-gray-700">첫구매 20% 할인 쿠폰</option>
               <option className="text-gray-700">
@@ -99,67 +146,72 @@ const ProducDetailPage = () => {
               </option>
             </select>
           </div>
-          <p className="mt-4">
+          <p className="mt-4 text-md">
             <span>배송정보</span>
             <span className="ml-8">무료 배송</span>
           </p>
 
-          <p className="mt-2">
+          <p className="mt-2 text-md">
             <span>도착예정</span>
             <span className="ml-8">도착 확률 95%</span>
-            <p className="mt-1 text-gray-400">
+            <p className="mt-2 text-gray-400">
               *배송 출발 이후 배송 기간은 2-3일 소요됩니다
             </p>
           </p>
 
-          <div className="relative">
-            {showOptions && (
-              <div className="dark:bg-gray-500 w-[988px] absolute -bottom-[2rem] transform translate-y-[0%] border bg-[#f1f1f1] rounded-lg p-6">
-                <div>
-                  <p className="mb-1 text-lg">색상</p>
-                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
-                    <option value="">색상을 선택하기</option>
-                    <option value="블랙">블랙</option>
-                    <option value="네이비">네이비</option>
-                    <option value="화이트">화이트</option>
+          {showOptions && (
+            <div className="dark:bg-gray-500 mt-4 border bg-[#fefefe] rounded-lg px-4 ">
+              {product.options?.map((option) => (
+                <div key={option.name} className="mt-2">
+                  <p className="mt-4 mb-1 text-lg">{option.label}</p>
+                  <select
+                    className="dark:bg-gray-300 border bg-[#f3f3f3] text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700"
+                    value={selectedOptions[option.name]?.label || ""}
+                    onChange={(e) =>
+                      handleOptionChange(option.name, e.target.value)
+                    }
+                  >
+                    <option value="">선택하세요</option>
+                    {option.values.map((value) => (
+                      <option key={value.label} value={value.label}>
+                        {value.label}{" "}
+                        {value.price > 0
+                          ? `(+${value.price.toLocaleString()}원)`
+                          : ""}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div className="mt-4">
-                  <p className="mb-1 text-lg">사이즈</p>
-                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
-                    <option value="">사이즈를 선택하기</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                  </select>
-                </div>
-                <hr className="flex mt-[4rem]" />
-                <p className="dark:text-gray-800 flex ml-[50rem] mt-[1rem] text-2xl font-bold">
-                  총 ${product.price}
-                </p>
-              </div>
-            )}
-          </div>
+              ))}
 
-          <div className="mt-4 flex z-[1]">
-            {showOptions && (
-              <div className="flex">
+              <hr className="mt-6" />
+              <p className="dark:text-gray-800 text-right mt-2 text-2xl font-bold">
+                총 {calculateTotalPrice().toLocaleString()}원
+              </p>
+            </div>
+          )}
+
+          <div className="mt-4 flex z-[1] gap-4">
+            {showOptions ? (
+              <>
                 <button
                   onClick={handleCartClick}
-                  className="rounded-lg dark:bg-gray-600 bg-white text-black dark:text-white border h-[4rem] w-[510px]"
+                  className="flex-1 rounded-lg bg-white dark:bg-gray-600 text-black dark:text-white border h-[4rem] font-semibold hover:opacity-90 transition"
                 >
                   장바구니
                 </button>
-              </div>
+                <button className="flex-1 rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition">
+                  바로 구매
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleBuyClick}
+                className="w-full rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition"
+              >
+                구매하기
+              </button>
             )}
-            <button
-              onClick={handleBuyClick}
-              className={`rounded-lg bg-gray-800 text-white border px-2 h-[4rem] ${
-                showOptions ? "ml-2 w-[510px]" : "w-full"
-              }`}
-            >
-              구매하기
-            </button>
           </div>
         </div>
       </div>

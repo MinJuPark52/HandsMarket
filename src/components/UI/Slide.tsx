@@ -24,7 +24,7 @@ const Slide = () => {
             {slides.map((index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-full h-64 bg-gray-300 flex items-center justify-center"
+                className="flex-shrink-0 w-full flex items-center justify-center"
               >
                 <img src="/slide.png" alt="슬라이드 이미지" />
               </div>
@@ -33,14 +33,14 @@ const Slide = () => {
         </div>
 
         <button
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-100 p-2 rounded border text-gray-600"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded border bg-[#f3f3f3]"
           onClick={prevSlide}
         >
           <FaChevronLeft size={24} />
         </button>
 
         <button
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-100 p-2 rounded border text-gray-600"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded border bg-[#f3f3f3]"
           onClick={nextSlide}
         >
           <FaChevronRight size={24} />

@@ -58,27 +58,25 @@ const Products = () => {
   return (
     <div className="flex justify-center">
       <div className="mt-2 mx-auto w-full min-w-[600px] max-w-[1024px]">
-        <h1 className="text-2xl mb-4 mt-2 font-semibold">
-          회원님을 위한 추천 상품
-        </h1>
+        <h1 className="text-xl mb-4 mt-2 font-medium">요즘 뜨는 신규 작품</h1>
         <div className="grid grid-cols-[repeat(4,_1fr)] gap-2">
           {productList.map((product: Product) => (
             <div
               key={product.id}
-              className="flex flex-col bg-white rounded-lg relative border border-gray-200"
+              className="flex flex-col bg-white rounded-lg relative"
             >
               <Link to={`/product/${product.id}`}>
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="h-[150px] w-full mb-2 object-contain mx-auto"
+                  className="h-[150px] w-full mb-2 object-cover rounded-t-lg"
                 />
               </Link>
               <i
-                className="absolute bottom-[60px] right-[15px] cursor-pointer"
+                className="absolute bottom-[80px] right-[10px] cursor-pointer"
                 onClick={() => handleAddToWishlist(product)}
               >
-                <div className="bg-gray-100 dark:bg-gray-500 rounded-full p-2">
+                <div className="bg-[#f3f3f3] dark:bg-gray-500 rounded-full p-2">
                   <FiHeart className="text-2xl text-black dark:text-white hover:text-red-500" />
                 </div>
               </i>
