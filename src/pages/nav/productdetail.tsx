@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { IoShareSocialOutline } from "react-icons/io5";
-import { FiHeart } from "react-icons/fi";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
+import { FiHeart } from "react-icons/fi";
+import { IoShareSocialOutline } from "react-icons/io5";
+import { GoX } from "react-icons/go";
 
 interface ProductOptionValue {
   label: string;
@@ -27,13 +27,17 @@ interface Product {
   options?: ProductOption[];
 }
 
+interface SelectedCombo {
+  options: { [key: string]: ProductOptionValue };
+  quantity: number;
+}
+
 const fetchProductById = async (id: string): Promise<Product | null> => {
   const docRef = doc(db, "product", id);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
     const data = docSnap.data() as Partial<Product>;
-
     return {
       id: docSnap.id,
       image: data.image ?? "",
@@ -47,30 +51,17 @@ const fetchProductById = async (id: string): Promise<Product | null> => {
   return null;
 };
 
-const ProducDetailPage = () => {
+const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [showOptions, setShowOptions] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: ProductOptionValue;
   }>({});
-
-  const handleOptionChange = (optionName: string, valueLabel: string) => {
-    const option = product?.options?.find((o) => o.name === optionName);
-    const value = option?.values.find((v) => v.label === valueLabel);
-    if (value) {
-      setSelectedOptions((prev) => ({ ...prev, [optionName]: value }));
-    }
-  };
-
-  const calculateTotalPrice = () => {
-    const basePrice = product?.price || 0;
-    const extra = Object.values(selectedOptions).reduce(
-      (sum, opt) => sum + opt.price,
-      0
-    );
-    return basePrice + extra;
-  };
+  const [selectedCombinations, setSelectedCombinations] = useState<
+    SelectedCombo[]
+  >([]);
 
   const {
     data: product,
@@ -82,10 +73,55 @@ const ProducDetailPage = () => {
     enabled: !!id,
   });
 
+  const handleOptionChange = (optionName: string, valueLabel: string) => {
+    const option = product?.options?.find((o) => o.name === optionName);
+    const value = option?.values.find((v) => v.label === valueLabel);
+    if (!value) return;
+
+    const updated = { ...selectedOptions, [optionName]: value };
+    setSelectedOptions(updated);
+
+    const allSelected =
+      product?.options?.every((opt) => updated[opt.name]) ?? false;
+
+    if (allSelected) {
+      const newCombo: SelectedCombo = {
+        options: updated,
+        quantity: 1,
+      };
+      setSelectedCombinations((prev) => [...prev, newCombo]);
+      setSelectedOptions({});
+    }
+  };
+
+  const updateQuantity = (index: number, delta: number) => {
+    setSelectedCombinations((prev) => {
+      const copy = [...prev];
+      const newQty = copy[index].quantity + delta;
+      if (newQty > 0) copy[index].quantity = newQty;
+      return copy;
+    });
+  };
+
+  const removeCombination = (index: number) => {
+    setSelectedCombinations((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const calculateTotalPrice = () => {
+    return selectedCombinations.reduce((total, combo) => {
+      const base = product?.price || 0;
+      const extra = Object.values(combo.options).reduce(
+        (sum, val) => sum + val.price,
+        0
+      );
+      return total + (base + extra) * combo.quantity;
+    }, 0);
+  };
+
   const handleBuyClick = () => setShowOptions(true);
 
   const handleCartClick = () => {
-    if (!product) return;
+    if (!product || selectedCombinations.length === 0) return;
 
     const isLoggedIn = Boolean(localStorage.getItem("userToken"));
     if (!isLoggedIn) {
@@ -93,18 +129,33 @@ const ProducDetailPage = () => {
       return;
     }
 
+    const cartItems = selectedCombinations.map((combo) => ({
+      product,
+      options: combo.options,
+      quantity: combo.quantity,
+    }));
+
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const isProductInCart = existingCart.some(
-      (item: Product) => item.id === product.id
+    const updatedCart = [...existingCart, ...cartItems];
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+    alert("장바구니에 추가되었습니다");
+    navigate("/cart");
+  };
+
+  const handleDirectBuy = () => {
+    if (!product || selectedCombinations.length === 0) return;
+
+    localStorage.setItem(
+      "directBuy",
+      JSON.stringify({
+        product,
+        combinations: selectedCombinations,
+        totalPrice: calculateTotalPrice(),
+      })
     );
 
-    if (!isProductInCart) {
-      existingCart.push(product);
-      localStorage.setItem("cart", JSON.stringify(existingCart));
-      alert("장바구니에 추가되었습니다");
-    }
-
-    navigate("/cart");
+    navigate("/pay");
   };
 
   if (isLoading) return <p>Loading product...</p>;
@@ -112,7 +163,7 @@ const ProducDetailPage = () => {
 
   return (
     <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
-      <div className="w-[1024x] flex gap-2">
+      <div className="w-[1024px] flex gap-4">
         <div className="w-[500px] h-[600px]">
           <img
             src={product.image}
@@ -122,7 +173,7 @@ const ProducDetailPage = () => {
         </div>
 
         <div className="w-[512px] p-4 flex flex-col">
-          <div className="w-full h-auto flex justify-between items-center">
+          <div className="flex justify-between items-center">
             <h2 className="mb-2 text-xl">{product.title}</h2>
             <div className="flex gap-2 ml-auto">
               <FiHeart className="text-2xl" />
@@ -132,38 +183,32 @@ const ProducDetailPage = () => {
 
           <p>{product.description}</p>
           <p className="text-xl font-semibold mt-2">
-            {product.price}
+            {product.price.toLocaleString()}
             <span className="font-light">원</span>
           </p>
           <hr className="mt-2" />
 
-          <div>
-            <select className="border p-2 text-lg w-full h-[4rem] mt-2 text-orange-500 rounded-lg">
-              <option className="text-gray-700">할인 쿠폰 받기</option>
-              <option className="text-gray-700">첫구매 20% 할인 쿠폰</option>
-              <option className="text-gray-700">
-                즐겨찾기 할인 쿠폰 1000원
-              </option>
-            </select>
-          </div>
-          <p className="mt-4 text-md">
-            <span>배송정보</span>
-            <span className="ml-8">무료 배송</span>
-          </p>
+          <select className="border p-2 text-lg w-full h-[4rem] mt-2 text-orange-500 rounded-lg">
+            <option>할인 쿠폰 받기</option>
+            <option>첫구매 20% 할인 쿠폰</option>
+            <option>즐겨찾기 할인 쿠폰 1000원</option>
+          </select>
 
-          <p className="mt-2 text-md">
-            <span>도착예정</span>
-            <span className="ml-8">도착 확률 95%</span>
-            <p className="mt-2 text-gray-400">
-              *배송 출발 이후 배송 기간은 2-3일 소요됩니다
-            </p>
+          <p className="mt-4">
+            배송정보 <span className="ml-8">무료 배송</span>
+          </p>
+          <p className="mt-2">
+            도착예정 <span className="ml-8">도착 확률 95%</span>
+          </p>
+          <p className="mt-2 text-gray-400">
+            *배송 출발 이후 배송 기간은 2-3일 소요됩니다
           </p>
 
           {showOptions && (
-            <div className="dark:bg-gray-500 mt-4 border bg-[#fefefe] rounded-lg px-4 ">
+            <div className="dark:bg-gray-500 mt-4 border bg-[#fefefe] rounded-lg px-4 py-2">
               {product.options?.map((option) => (
                 <div key={option.name} className="mt-2">
-                  <p className="mt-4 mb-1 text-lg">{option.label}</p>
+                  <p className="mb-1 text-lg">{option.label}</p>
                   <select
                     className="dark:bg-gray-300 border bg-[#f3f3f3] text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700"
                     value={selectedOptions[option.name]?.label || ""}
@@ -174,9 +219,9 @@ const ProducDetailPage = () => {
                     <option value="">선택하세요</option>
                     {option.values.map((value) => (
                       <option key={value.label} value={value.label}>
-                        {value.label}{" "}
+                        {value.label}
                         {value.price > 0
-                          ? `(+${value.price.toLocaleString()}원)`
+                          ? ` (+${value.price.toLocaleString()}원)`
                           : ""}
                       </option>
                     ))}
@@ -184,10 +229,66 @@ const ProducDetailPage = () => {
                 </div>
               ))}
 
-              <hr className="mt-6" />
-              <p className="dark:text-gray-800 text-right mt-2 text-2xl font-bold">
-                총 {calculateTotalPrice().toLocaleString()}원
-              </p>
+              {selectedCombinations.map((combo, index) => {
+                const combinationText = product?.options
+                  ?.map((opt) => {
+                    const value = combo.options[opt.name];
+                    return `${opt.label}: ${value?.label}`;
+                  })
+                  .join(" / ");
+
+                const extraPrice = Object.values(combo.options).reduce(
+                  (sum, val) => sum + val.price,
+                  0
+                );
+                const unitPrice = (product?.price || 0) + extraPrice;
+                const totalPrice = unitPrice * combo.quantity;
+
+                return (
+                  <div
+                    key={`${combinationText}-${index}`}
+                    className="border rounded p-3 mt-4 bg-white dark:bg-gray-800"
+                  >
+                    <div className="flex justify-between items-center">
+                      <p>{combinationText}</p>
+                      <button
+                        onClick={() => removeCombination(index)}
+                        className="text-red-500 text-xl hover:underline"
+                      >
+                        <GoX />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-2 gap-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateQuantity(index, -1)}
+                          className="px-3 py-1 border rounded"
+                        >
+                          -
+                        </button>
+                        <span className="text-lg">{combo.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(index, 1)}
+                          className="px-3 py-1 border rounded"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <p className="text-gray-700 dark:text-gray-300">
+                        {totalPrice.toLocaleString()}원
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {selectedCombinations.length > 0 && (
+                <p className="text-right text-xl font-bold mt-6">
+                  총 금액: {calculateTotalPrice().toLocaleString()}원
+                </p>
+              )}
             </div>
           )}
 
@@ -200,7 +301,10 @@ const ProducDetailPage = () => {
                 >
                   장바구니
                 </button>
-                <button className="flex-1 rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition">
+                <button
+                  onClick={handleDirectBuy}
+                  className="flex-1 rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition"
+                >
                   바로 구매
                 </button>
               </>
@@ -219,4 +323,4 @@ const ProducDetailPage = () => {
   );
 };
 
-export default ProducDetailPage;
+export default ProductDetailPage;

@@ -1,86 +1,93 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import useSignupStore from "../../stores/signupStore";
 import { auth } from "../../firebase/firebaseConfig";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const SignupPage = () => {
-  const {
-    id,
-    password,
-    passwordAgain,
-    nickname,
-    emailDomain,
-    error,
-    setField,
-    setError,
-    resetError,
-  } = useSignupStore();
+const signupSchema = z
+  .object({
+    id: z.string().min(1, "이메일을 입력해주세요"),
+    emailDomain: z.enum([
+      "@gmail.com",
+      "@naver.com",
+      "@outlook.com",
+      "@daum.com",
+    ]),
+    password: z
+      .string()
+      .min(6, "비밀번호는 최소 6자리 이상이어야 합니다")
+      .max(12, "비밀번호는 최대 12자리입니다")
+      .regex(
+        /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])/,
+        "비밀번호는 소문자, 숫자, 특수문자를 포함해야 합니다"
+      ),
+    passwordAgain: z.string().min(1, "비밀번호 재입력을 입력해주세요"),
+    nickname: z.string().min(1, "닉네임을 입력해주세요"),
+  })
+  .refine((data) => data.password === data.passwordAgain, {
+    message: "비밀번호가 일치하지 않습니다",
+    path: ["passwordAgain"],
+  });
 
+type SignupFormData = z.infer<typeof signupSchema>;
+
+const SignupPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const loginSubmit = async (e: any) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      emailDomain: "@gmail.com",
+    },
+  });
 
-    if (!id) {
-      setError("이메일: 필수 정보입니다.");
-    } else if (!password) {
-      setError("비밀번호: 필수 정보입니다.");
-    } else if (!passwordAgain) {
-      setError("비밀번호 재입력이 필요합니다.");
-    } else if (password !== passwordAgain) {
-      setError("비밀번호가 일치하지 않습니다.");
-    } else if (!nickname) {
-      setError("닉네임: 필수 정보입니다.");
-    } else {
-      resetError();
-      const fullEmail = `${id}${emailDomain}`;
+  const onSubmit = async (data: SignupFormData) => {
+    const fullEmail = `${data.id}${data.emailDomain}`;
 
-      try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          fullEmail,
-          password
-        );
-        const user = userCredential.user;
-
-        await updateProfile(user, {
-          displayName: nickname,
-        });
-
-        alert("회원가입을 완료했습니다.");
-        navigate("/");
-      } catch (error: any) {
-        setError(`회원가입 오류: ${error.message}`);
-      }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        fullEmail,
+        data.password
+      );
+      await updateProfile(userCredential.user, {
+        displayName: data.nickname,
+      });
+      alert("회원가입을 완료했습니다.");
+      navigate("/");
+    } catch (error: any) {
+      alert(`회원가입 오류: ${error.message}`);
+      console.error(error);
     }
   };
 
   return (
     <div className="mt-[4rem]">
       <form
-        onSubmit={loginSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="mx-auto w-full max-w-[1024px] text-center my-[10px] py-4"
       >
-        <div className="w-full max-w-[600px] mx-auto text-left">
-          <div className="dark:text-white text-sm no-underline mb-4">
-            <h1 className="text-3xl font-semibold dark:text-white">SignUp</h1>
-          </div>
+        <div className="w-full max-w-[600px] mx-auto text-left mb-4">
+          <h1 className="text-3xl font-semibold dark:text-white">SignUp</h1>
         </div>
 
-        <div>
+        <div className="flex items-center justify-center mb-2">
           <input
-            className="w-[420px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[420px] h-[50px] p-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="이메일"
             type="text"
-            value={id}
-            onChange={(e) => setField("id", e.target.value)}
+            {...register("id")}
           />
           <span className="p-2 mx-2 dark:text-white">@</span>
           <select
-            className="p-2 h-[50px] my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
-            value={emailDomain}
-            onChange={(e) => setField("emailDomain", e.target.value)}
+            className="p-2 h-[50px] border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
+            {...register("emailDomain")}
           >
             <option value="@gmail.com">gmail.com</option>
             <option value="@naver.com">naver.com</option>
@@ -88,36 +95,56 @@ const SignupPage = () => {
             <option value="@daum.com">daum.com</option>
           </select>
         </div>
+        {errors.id && (
+          <p className="text-red-500 text-sm mb-1">{errors.id.message}</p>
+        )}
+        {errors.emailDomain && (
+          <p className="text-red-500 text-sm mb-1">
+            {errors.emailDomain.message}
+          </p>
+        )}
+
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="비밀번호"
             type="password"
-            value={password}
-            onChange={(e) => setField("password", e.target.value)}
+            {...register("password")}
           />
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password.message}</p>
+          )}
         </div>
+
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="비밀번호 재입력"
             type="password"
-            value={passwordAgain}
-            onChange={(e) => setField("passwordAgain", e.target.value)}
+            {...register("passwordAgain")}
           />
+          {errors.passwordAgain && (
+            <p className="text-red-500 text-sm">
+              {errors.passwordAgain.message}
+            </p>
+          )}
         </div>
+
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="닉네임"
             type="text"
-            value={nickname}
-            onChange={(e) => setField("nickname", e.target.value)}
+            {...register("nickname")}
           />
+          {errors.nickname && (
+            <p className="text-red-500 text-sm">{errors.nickname.message}</p>
+          )}
         </div>
-        {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
+
         <button
-          className="mt-2 w-[600px] h-[50px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600"
+          disabled={isSubmitting}
+          className="mt-2 w-[600px] h-[50px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600 disabled:opacity-50"
           type="submit"
         >
           회원가입

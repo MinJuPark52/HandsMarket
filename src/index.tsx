@@ -19,6 +19,8 @@ import ProductDetail from "./pages/nav/productdetail";
 import Nav from "./components/UI/Nav";
 import Wish from "./pages/myPage/wish";
 import Profile from "pages/myPage/profile";
+import Pay from "pages/order/pay";
+import Payment from "pages/order/payment";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -76,6 +78,8 @@ const RoutesWrapper = ({
         <Route path="/cart" element={<Cart />} />
         <Route path="/wish" element={<Wish />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/pay" element={<Pay />} />
+        <Route path="/payment" element={<Payment />} />
         <Route path="/search" element={<Search />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>

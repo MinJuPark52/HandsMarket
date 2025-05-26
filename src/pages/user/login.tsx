@@ -1,38 +1,39 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import LoginStore from "../../stores/loginStore";
 
+const loginSchema = z.object({
+  id: z
+    .string()
+    .min(1, "이메일을 입력해주세요")
+    .email("유효한 이메일 형식을 입력해주세요"),
+  password: z
+    .string()
+    .min(1, "비밀번호를 입력해주세요")
+    .regex(
+      /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{6,12}$/,
+      "비밀번호는 특수문자, 소문자, 숫자를 포함하여 6~12자여야 합니다"
+    ),
+});
+
+type FormData = z.infer<typeof loginSchema>;
+
 const LoginPage: React.FC = () => {
-  const { id, password, error, setId, setPassword, setError, setIsLoggedIn } =
-    LoginStore();
+  const { setIsLoggedIn, setError } = LoginStore();
   const navigate = useNavigate();
 
-  const loginSubmit = async (e: any) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-    if (!id && !password) {
-      setError("이메일 또는 비밀번호를 입력해주세요");
-      return;
-    } else if (!id) {
-      setError("이메일을 입력해주세요");
-      return;
-    } else if (!emailRegex.test(id)) {
-      setError("유효한 이메일 형식을 입력해주세요");
-      return;
-    } else if (!password) {
-      setError("비밀번호를 입력해주세요");
-      return;
-    }
-
-    const passwordRegex = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{6,12}$/;
-    if (!passwordRegex.test(password)) {
-      setError("비밀번호는 특수문자, 대소문자, 숫자를 포함하여 입력해주세요");
-      return;
-    }
-
-    setError("");
-
+  const onSubmit = async (data: FormData) => {
     try {
       setIsLoggedIn(true);
       alert("로그인되었습니다.");
@@ -52,36 +53,35 @@ const LoginPage: React.FC = () => {
     <div className="mt-[5rem]">
       <form
         className="mx-auto w-full max-w-[1024px] text-center"
-        onSubmit={loginSubmit}
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="w-full max-w-[600px] mx-auto text-left">
-          <div className="dark:text-white text-sm no-underline mb-4">
-            <h1 className="text-3xl font-semibold dark:text-white">SignIn</h1>
-          </div>
+        <div className="w-full max-w-[600px] mx-auto text-left mb-4">
+          <h1 className="text-3xl font-semibold dark:text-white">SignIn</h1>
         </div>
 
         <div>
           <input
             className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="이메일"
-            type="text"
-            id="id"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
+            {...register("id")}
           />
+          {errors.id && (
+            <p className="text-red-500 text-sm">{errors.id.message}</p>
+          )}
         </div>
+
         <div>
           <input
             className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
             placeholder="비밀번호"
             type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            {...register("password")}
           />
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password.message}</p>
+          )}
         </div>
 
-        {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
         <button
           className="mt-2 w-[600px] h-[50px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600"
           type="submit"
