@@ -6,6 +6,7 @@ import { db } from "../../firebase/firebaseConfig";
 import { FiHeart } from "react-icons/fi";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { GoX } from "react-icons/go";
+import Category from "./category";
 
 interface ProductOptionValue {
   label: string;
@@ -25,11 +26,19 @@ interface Product {
   description: string;
   price: number;
   options?: ProductOption[];
+  authorId?: string;
+  author?: Author;
 }
 
 interface SelectedCombo {
   options: { [key: string]: ProductOptionValue };
   quantity: number;
+}
+
+interface Author {
+  name: string;
+  profileImage: string;
+  detailImages?: string;
 }
 
 const fetchProductById = async (id: string): Promise<Product | null> => {
@@ -38,6 +47,22 @@ const fetchProductById = async (id: string): Promise<Product | null> => {
 
   if (docSnap.exists()) {
     const data = docSnap.data() as Partial<Product>;
+
+    let author: Author | undefined = undefined;
+
+    if (data.authorId) {
+      const authorRef = doc(db, "authors", data.authorId);
+      const authorSnap = await getDoc(authorRef);
+      if (authorSnap.exists()) {
+        const authorData = authorSnap.data() as Author;
+        author = {
+          name: authorData.name ?? "",
+          profileImage: authorData.profileImage ?? "",
+          detailImages: authorData.detailImages ?? "",
+        };
+      }
+    }
+
     return {
       id: docSnap.id,
       image: data.image ?? "",
@@ -45,6 +70,8 @@ const fetchProductById = async (id: string): Promise<Product | null> => {
       description: data.description ?? "",
       price: Number(data.price ?? 0),
       options: data.options ?? [],
+      authorId: data.authorId,
+      author,
     };
   }
 
@@ -55,7 +82,6 @@ const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [showOptions, setShowOptions] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: ProductOptionValue;
   }>({});
@@ -118,8 +144,6 @@ const ProductDetailPage = () => {
     }, 0);
   };
 
-  const handleBuyClick = () => setShowOptions(true);
-
   const handleCartClick = () => {
     if (!product || selectedCombinations.length === 0) return;
 
@@ -158,53 +182,68 @@ const ProductDetailPage = () => {
     navigate("/pay");
   };
 
+  const chatRoom = () => {
+    navigate("/chatroom");
+  };
+
   if (isLoading) return <p>Loading product...</p>;
   if (error || !product) return <p>Product not found or error occurred.</p>;
 
   return (
-    <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
-      <div className="w-[1024px] flex gap-4">
-        <div className="w-[500px] h-[600px]">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        <div className="w-[512px] p-4 flex flex-col">
-          <div className="flex justify-between items-center">
-            <h2 className="mb-2 text-xl">{product.title}</h2>
-            <div className="flex gap-2 ml-auto">
-              <FiHeart className="text-2xl" />
-              <IoShareSocialOutline className="text-2xl ml-2" />
-            </div>
+    <>
+      <div className="dark:text-white flex justify-center px-4 mt-20">
+        <div className="w-[1024px] flex gap-4">
+          <div className="w-[500px] h-[600px]">
+            <img
+              src={product.image}
+              alt={product.title}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          <p>{product.description}</p>
-          <p className="text-xl font-semibold mt-2">
-            {product.price.toLocaleString()}
-            <span className="font-light">원</span>
-          </p>
-          <hr className="mt-2" />
+          <div className="w-[512px] px-4 flex flex-col">
+            {product.author && (
+              <div className="flex items-center gap-2 mb-2 text-md text-gray-700 dark:text-gray-300">
+                <img
+                  src={product.author.profileImage}
+                  alt={product.author.name}
+                  className="w-9 h-9 rounded-full"
+                />
+                <span className="font-medium">{product.author.name}</span>
+              </div>
+            )}
 
-          <select className="border p-2 text-lg w-full h-[4rem] mt-2 text-orange-500 rounded-lg">
-            <option>할인 쿠폰 받기</option>
-            <option>첫구매 20% 할인 쿠폰</option>
-            <option>즐겨찾기 할인 쿠폰 1000원</option>
-          </select>
+            <div className="flex justify-between items-center">
+              <h2 className="mb-2 text-xl">{product.title}</h2>
+              <div className="flex gap-2 ml-auto">
+                <FiHeart className="text-2xl" />
+                <IoShareSocialOutline className="text-2xl ml-2" />
+              </div>
+            </div>
 
-          <p className="mt-4">
-            배송정보 <span className="ml-8">무료 배송</span>
-          </p>
-          <p className="mt-2">
-            도착예정 <span className="ml-8">도착 확률 95%</span>
-          </p>
-          <p className="mt-2 text-gray-400">
-            *배송 출발 이후 배송 기간은 2-3일 소요됩니다
-          </p>
+            <p>{product.description}</p>
+            <p className="text-xl font-semibold mt-2">
+              {product.price.toLocaleString()}
+              <span className="font-light">원</span>
+            </p>
+            <hr className="mt-2" />
 
-          {showOptions && (
+            <select className="border p-2 text-lg w-full h-[4rem] mt-2 text-orange-500 rounded-lg">
+              <option>할인 쿠폰 받기</option>
+              <option>첫구매 20% 할인 쿠폰</option>
+              <option>즐겨찾기 할인 쿠폰 1000원</option>
+            </select>
+
+            <p className="mt-4">
+              배송정보 <span className="ml-8">무료 배송</span>
+            </p>
+            <p className="mt-2">
+              도착예정 <span className="ml-8">도착 확률 95%</span>
+            </p>
+            <p className="mt-2 text-gray-400">
+              *배송 출발 이후 배송 기간은 2-3일 소요됩니다
+            </p>
+
             <div className="dark:bg-gray-500 mt-4 border bg-[#fefefe] rounded-lg px-4 py-2">
               {product.options?.map((option) => (
                 <div key={option.name} className="mt-2">
@@ -290,36 +329,52 @@ const ProductDetailPage = () => {
                 </p>
               )}
             </div>
-          )}
 
-          <div className="mt-4 flex z-[1] gap-4">
-            {showOptions ? (
-              <>
-                <button
-                  onClick={handleCartClick}
-                  className="flex-1 rounded-lg bg-white dark:bg-gray-600 text-black dark:text-white border h-[4rem] font-semibold hover:opacity-90 transition"
-                >
-                  장바구니
-                </button>
-                <button
-                  onClick={handleDirectBuy}
-                  className="flex-1 rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition"
-                >
-                  바로 구매
-                </button>
-              </>
-            ) : (
+            <div className="mt-2 flex z-[1] gap-4">
               <button
-                onClick={handleBuyClick}
-                className="w-full rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition"
+                onClick={handleCartClick}
+                className="flex-1 rounded-lg bg-white dark:bg-gray-600 text-black dark:text-white border h-[4rem] font-semibold hover:opacity-90 transition"
               >
-                구매하기
+                장바구니
               </button>
-            )}
+              <button
+                onClick={handleDirectBuy}
+                className="flex-1 rounded-lg bg-orange-500 text-white border h-[4rem] font-semibold hover:opacity-90 transition"
+              >
+                바로 구매
+              </button>
+            </div>
+
+            <button
+              onClick={chatRoom}
+              className="relative flex mx-aut mt-4 px-4 py-2 w-[230px] border border-orange-400 rounded-lg hover:bg-orange-100 tems-center justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                className="text-orange-500 icon icon-tabler icons-tabler-outline icon-tabler-message"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M8 9h8" />
+                <path d="M8 13h6" />
+                <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
+              </svg>
+
+              <span className="ml-2 text-md text-orange-500">상품 문의</span>
+            </button>
           </div>
         </div>
       </div>
-    </div>
+
+      <Category product={product} />
+    </>
   );
 };
 

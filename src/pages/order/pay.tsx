@@ -6,7 +6,7 @@ import { GoChevronDown, GoChevronUp } from "react-icons/go";
 import OrdererInfo from "./orderInfo";
 import Payment from "../order/payment";
 
-// Zod 유효성 스키마
+// Zod 유효성 검사
 const schema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
   phone: z.string().min(10, "전화번호를 입력해주세요"),
@@ -26,7 +26,7 @@ type ProductForPay = {
   image?: string;
 };
 
-// 결제 수단 타입과 값 정의
+// 결제 수단 타입
 const paymentMethods = ["card", "bank", "phone"] as const;
 type PaymentMethod = (typeof paymentMethods)[number];
 
@@ -39,7 +39,7 @@ const Pay: React.FC = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    setValue, // ✅ setValue 포함
+    setValue,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -102,6 +102,27 @@ const Pay: React.FC = () => {
     }
   }, []);
 
+  const validateForm = (): boolean => {
+    if (!watch("name")) {
+      alert("주문자 이름을 입력해주세요.");
+      return false;
+    }
+    if (!watch("phone")) {
+      alert("연락처를 입력해주세요.");
+      return false;
+    }
+    const email = watch("email");
+    if (email && !/\S+@\S+\.\S+/.test(email)) {
+      alert("이메일을 입력해주세요.");
+      return false;
+    }
+    if (!watch("address")) {
+      alert("유효한 배송지를 입력해주세요.");
+      return false;
+    }
+    return true;
+  };
+
   const onSubmit = (data: FormData) => {
     alert("주문 완료!\n" + JSON.stringify(data, null, 2));
   };
@@ -125,7 +146,9 @@ const Pay: React.FC = () => {
                 {isOrderInfoOpen ? <GoChevronUp /> : <GoChevronDown />}
               </span>
             </h2>
-            {isOrderInfoOpen && <OrdererInfo register={register} />}
+            {isOrderInfoOpen && (
+              <OrdererInfo register={register} errors={errors} />
+            )}
           </section>
 
           {/* 주문 상품 */}
@@ -204,6 +227,8 @@ const Pay: React.FC = () => {
               address: watch("address"),
               postcode: "00000",
             }}
+            paymentMethod={watch("payment")}
+            validateForm={validateForm}
           />
         </div>
       </div>

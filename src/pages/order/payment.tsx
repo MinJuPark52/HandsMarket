@@ -26,9 +26,16 @@ type Buyer = {
 type PaymentPageProps = {
   products: Product[];
   buyer: Buyer;
+  paymentMethod: "card" | "bank" | "phone";
+  validateForm: () => boolean;
 };
 
-const Payment: React.FC<PaymentPageProps> = ({ products, buyer }) => {
+const Payment: React.FC<PaymentPageProps> = ({
+  products,
+  buyer,
+  paymentMethod,
+  validateForm,
+}) => {
   const db = getFirestore(getApp());
 
   const totalPrice = products.reduce(
@@ -37,6 +44,21 @@ const Payment: React.FC<PaymentPageProps> = ({ products, buyer }) => {
   );
 
   const handlePayment = () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    const paymentLabels = {
+      card: "신용/체크카드",
+      bank: "무통장 입금",
+      phone: "핸드폰 결제",
+    } as const;
+
+    if (paymentMethod !== "card") {
+      alert(`"${paymentLabels[paymentMethod]}"는 아직 지원하지 않습니다.`);
+      return;
+    }
+
     const { IMP } = window;
     const merchantCode = process.env.REACT_APP_PORTONE_MERCHANT_ID;
 

@@ -58,7 +58,7 @@ const Products = () => {
   return (
     <div className="flex justify-center">
       <div className="mt-2 mx-auto w-full min-w-[600px] max-w-[1024px]">
-        <h1 className="text-xl mb-4 mt-2 font-medium">요즘 뜨는 신규 작품</h1>
+        <h1 className="text-xl mb-4 mt-2 font-medium">요즘 뜨는 인기 작품</h1>
         <div className="grid grid-cols-[repeat(4,_1fr)] gap-2">
           {productList.map((product: Product) => (
             <div
