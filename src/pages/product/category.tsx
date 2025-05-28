@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import Comment from "../product/comment";
+import Recommend from "../product/recommend";
 
 interface CategoryProps {
   product: {
+    id: string;
+    tags?: string[];
     author?: {
       detailImages?: string;
     };
@@ -46,7 +50,7 @@ const Category: React.FC<CategoryProps> = ({ product }) => {
       </div>
 
       {/* 내용 영역 */}
-      <div className="px-2">
+      <div className="p-2">
         {activeTab === "details" && (
           <div>
             {product.author?.detailImages && (
@@ -61,19 +65,16 @@ const Category: React.FC<CategoryProps> = ({ product }) => {
 
         {activeTab === "comments" && (
           <div>
-            <h3 className="text-lg font-bold mb-2">댓글</h3>
-            <p className="text-gray-700">
-              사용자들의 댓글 목록이 여기에 표시됩니다.
-            </p>
+            <Comment postId="test-post-123" />
           </div>
         )}
 
         {activeTab === "recommend" && (
           <div>
-            <h3 className="text-lg font-bold mb-2">추천 상품</h3>
-            <p className="text-gray-700">
-              비슷한 상품 또는 추천 상품 리스트를 보여줍니다.
-            </p>
+            <Recommend
+              tags={product.tags || []}
+              currentProductId={product.id}
+            />
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { useQuery } from "@tanstack/react-query";
+import { BeatLoader } from "react-spinners";
 
 interface Product {
   id: number;
@@ -33,7 +34,13 @@ const ProducDetailPage = () => {
     queryFn: fetchProducts,
   });
 
-  if (isLoading) return <p>Loading product...</p>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-20">
+        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+      </div>
+    );
+
   if (error) return <p>Error loading product data.</p>;
 
   const product = products?.find((item) => item.id === Number(id));

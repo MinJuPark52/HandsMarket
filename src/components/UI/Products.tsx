@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "../../firebase/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
+import { BeatLoader } from "react-spinners";
 
 interface Product {
   id: string;
@@ -49,7 +50,12 @@ const Products = () => {
   };
 
   if (isLoading)
-    return <p className="text-center text-lg">Loading products...</p>;
+    return (
+      <div className="flex justify-center items-center h-20">
+        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+      </div>
+    );
+
   if (error)
     return <p className="text-center text-lg">Error loading products.</p>;
   if (!productList || productList.length === 0)

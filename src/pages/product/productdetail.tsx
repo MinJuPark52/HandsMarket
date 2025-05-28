@@ -7,6 +7,7 @@ import { FiHeart } from "react-icons/fi";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { GoX } from "react-icons/go";
 import Category from "./category";
+import { BeatLoader } from "react-spinners";
 
 interface ProductOptionValue {
   label: string;
@@ -28,6 +29,7 @@ interface Product {
   options?: ProductOption[];
   authorId?: string;
   author?: Author;
+  tags?: string[];
 }
 
 interface SelectedCombo {
@@ -62,6 +64,7 @@ const fetchProductById = async (id: string): Promise<Product | null> => {
         };
       }
     }
+    const tags = data.tags ?? [];
 
     return {
       id: docSnap.id,
@@ -72,6 +75,7 @@ const fetchProductById = async (id: string): Promise<Product | null> => {
       options: data.options ?? [],
       authorId: data.authorId,
       author,
+      tags,
     };
   }
 
@@ -185,8 +189,12 @@ const ProductDetailPage = () => {
   const chatRoom = () => {
     navigate("/chatroom");
   };
-
-  if (isLoading) return <p>Loading product...</p>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-20">
+        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+      </div>
+    );
   if (error || !product) return <p>Product not found or error occurred.</p>;
 
   return (
@@ -356,9 +364,9 @@ const ProductDetailPage = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 className="text-orange-500 icon icon-tabler icons-tabler-outline icon-tabler-message"
               >
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
