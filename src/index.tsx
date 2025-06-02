@@ -11,15 +11,18 @@ import {
   useLocation,
 } from "react-router-dom";
 import App from "./App";
+import AuthListener from "./components/AuthListener";
 import Login from "./pages/user/login";
 import Signup from "./pages/user/signup";
 import Cart from "./pages/nav/cart";
 import Search from "./pages/nav/search";
-import ProductDetail from "./pages/product/productdetail";
+import ProductDetail from "./pages/product/productDetail";
 import Nav from "./components/UI/Nav";
 import Wish from "./pages/myPage/wish";
 import Profile from "pages/myPage/profile";
 import Pay from "pages/order/pay";
+import ChatRoom from "pages/chat/chatRoom";
+import ChatList from "pages/chat/chatList";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -50,6 +53,7 @@ const Index = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <AuthListener />
         <RoutesWrapper isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       </Router>
     </QueryClientProvider>
@@ -79,6 +83,8 @@ const RoutesWrapper = ({
         <Route path="/profile" element={<Profile />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/chatroom/:chatId/:sellerId" element={<ChatRoom />} />
+        <Route path="/chatList" element={<ChatList />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>
     </>

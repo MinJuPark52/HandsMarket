@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import LoginStore from "../../stores/loginStore";
+import useLoginStore from "../../stores/useLoginStore";
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
+import { auth } from "../../firebase/firebaseConfig";
 
 const loginSchema = z.object({
   id: z
@@ -22,8 +28,10 @@ const loginSchema = z.object({
 type FormData = z.infer<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
-  const { setIsLoggedIn, setError } = LoginStore();
+  const setLogin = useLoginStore((state) => state.setLogin);
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+  const [userType, setUserType] = useState<"user" | "seller">("user");
 
   const {
     register,
@@ -35,8 +43,18 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      setIsLoggedIn(true);
-      alert("로그인되었습니다.");
+      await setPersistence(auth, browserLocalPersistence);
+
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        data.id,
+        data.password
+      );
+      const user = userCredential.user;
+      setLogin(user.uid, user.email || "");
+
+      alert(`로그인되었습니다.`);
+      setError("");
       navigate("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -56,7 +74,36 @@ const LoginPage: React.FC = () => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="w-full max-w-[600px] mx-auto text-left mb-4">
-          <h1 className="text-3xl font-semibold dark:text-white">SignIn</h1>
+          <h1 className="flex justify-center text-3xl font-semibold dark:text-white">
+            SignIn
+          </h1>
+        </div>
+
+        <div className="mx-auto w-full max-w-[600px] text-center mb-6">
+          <div className="flex justify-center mb-6 border-b border-gray-200">
+            <button
+              type="button"
+              onClick={() => setUserType("user")}
+              className={`w-1/2 py-3 text-lg font-medium ${
+                userType === "user"
+                  ? "text-orange-500 border-b-2 border-orange-500"
+                  : "text-gray-400"
+              }`}
+            >
+              일반 회원
+            </button>
+            <button
+              type="button"
+              onClick={() => setUserType("seller")}
+              className={`w-1/2 py-3 text-lg font-medium ${
+                userType === "seller"
+                  ? "text-orange-500 border-b-2 border-orange-500"
+                  : "text-gray-400"
+              }`}
+            >
+              판매자
+            </button>
+          </div>
         </div>
 
         <div>
@@ -81,6 +128,9 @@ const LoginPage: React.FC = () => {
             <p className="text-red-500 text-sm">{errors.password.message}</p>
           )}
         </div>
+
+        {/* 로그인 실패 시 에러 메시지 출력 */}
+        {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
 
         <button
           className="mt-2 w-[600px] h-[50px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600"

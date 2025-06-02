@@ -1,5 +1,5 @@
 import React from "react";
-import LoginStore from "../../stores/loginStore";
+import useLoginStore from "../../stores/useLoginStore";
 import { useNavigate, Link } from "react-router-dom";
 import {
   FiShoppingCart,
@@ -16,7 +16,7 @@ interface NavProps {
 
 const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
   const navigate = useNavigate();
-  const isLoggedIn = LoginStore((state) => state.isLoggedIn);
+  const isLoggedIn = useLoginStore((state) => state.isLoggedIn);
 
   return (
     <div className="max-w-[1024px] mx-auto flex justify-between items-center py-4 fixed top-0 left-0 right-0 z-[1000] bg-[#ffffff] dark:bg-gray-800 text-black dark:text-white">

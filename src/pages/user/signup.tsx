@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase/firebaseConfig";
+import { auth, db } from "../../firebase/firebaseConfig";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 const signupSchema = z
   .object({
@@ -35,6 +36,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const [userType, setUserType] = useState<"user" | "seller">("user"); // 🔹 회원 타입 상태
 
   const {
     register,
@@ -56,9 +58,19 @@ const SignupPage: React.FC = () => {
         fullEmail,
         data.password
       );
+
       await updateProfile(userCredential.user, {
         displayName: data.nickname,
       });
+
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        nickname: data.nickname,
+        userType, // "user" 또는 "seller"
+        profileImage:
+          "https://i.postimg.cc/brX5zTtF/mike-yukhtenko-a2k-D4b0-KK4s-unsplash.jpg",
+        createdAt: serverTimestamp(),
+      });
+
       alert("회원가입을 완료했습니다.");
       navigate("/");
     } catch (error: any) {
@@ -75,6 +87,31 @@ const SignupPage: React.FC = () => {
       >
         <div className="w-full max-w-[600px] mx-auto text-left mb-4">
           <h1 className="text-3xl font-semibold dark:text-white">SignUp</h1>
+        </div>
+
+        <div className="w-[600px] mx-auto flex justify-center mb-6 border-b border-gray-200">
+          <button
+            type="button"
+            onClick={() => setUserType("user")}
+            className={`w-1/2 py-3 text-lg font-medium ${
+              userType === "user"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-gray-400"
+            }`}
+          >
+            일반 회원
+          </button>
+          <button
+            type="button"
+            onClick={() => setUserType("seller")}
+            className={`w-1/2 py-3 text-lg font-medium ${
+              userType === "seller"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-gray-400"
+            }`}
+          >
+            판매자
+          </button>
         </div>
 
         <div className="flex items-center justify-center mb-2">

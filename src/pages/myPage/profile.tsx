@@ -1,32 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import useLoginStore from "../../stores/useLoginStore";
+import { BeatLoader } from "react-spinners";
 
 const Profile = () => {
-  const [userInfo, setUserInfo] = useState<{
-    email: string;
-    displayName: string | null;
-  }>({
-    email: "",
-    displayName: "",
-  });
-
+  const { email, nickname, profileImage, isLoggedIn, logout } = useLoginStore();
+  const [isLoading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = auth.currentUser;
-
-    if (user) {
-      setUserInfo({
-        email: user.email || "",
-        displayName: user.displayName,
-      });
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      setLoading(false);
     }
-  }, []);
+  }, [isLoggedIn, navigate]);
 
   const handleLogout = async () => {
     try {
       await auth.signOut();
+      logout();
       alert("로그아웃되었습니다.");
       navigate("/");
     } catch (error: any) {
@@ -34,15 +28,28 @@ const Profile = () => {
     }
   };
 
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-20">
+        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+      </div>
+    );
+
+  if (!isLoggedIn) return null;
+
   return (
     <div className="min-h-screen bg-gray-100 max-w-[1024px] mx-auto py-20">
       <div className="bg-gray-200 h-[120px] p-6 flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-gray-800" />
+        <img
+          src={profileImage || "/default-profile.png"}
+          alt="프로필 사진"
+          className="w-16 h-16 rounded-full object-cover"
+        />
         <div>
           <h3 className="text-xl font-semibold text-gray-800">
-            {userInfo.displayName}님 안녕하세요!
+            {nickname || "사용자"}님 안녕하세요!
           </h3>
-          <p className="text-md text-gray-700">{userInfo.email}</p>
+          <p className="text-md text-gray-700">{email}</p>
         </div>
       </div>
 
@@ -54,6 +61,17 @@ const Profile = () => {
           </div>
           <span className="text-gray-500">{">"}</span>
         </div>
+
+        <div
+          className="bg-white p-4 flex items-center justify-between border cursor-pointer"
+          onClick={() => navigate("/chatList")}
+        >
+          <div className="flex items-center gap-4">
+            <span className="font-semibold text-gray-700">채팅 목록</span>
+          </div>
+          <span className="text-gray-500">{">"}</span>
+        </div>
+
         <div className="bg-white p-4 flex items-center justify-between border">
           <div className="flex items-center gap-4">
             <span className="font-semibold text-gray-700">관심 상품</span>
@@ -66,14 +84,7 @@ const Profile = () => {
           </div>
           <span className="text-gray-500">{">"}</span>
         </div>
-        <div className="bg-white p-4 flex items-center justify-between border">
-          <div className="flex items-center gap-4">
-            <span className="font-semibold text-gray-700">
-              판매자 문의 내역
-            </span>
-          </div>
-          <span className="text-gray-500">{">"}</span>
-        </div>
+
         <div
           className="bg-white p-4 flex items-center justify-between border cursor-pointer"
           onClick={handleLogout}

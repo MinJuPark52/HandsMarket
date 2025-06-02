@@ -182,13 +182,17 @@ const ProductDetailPage = () => {
         totalPrice: calculateTotalPrice(),
       })
     );
-
     navigate("/pay");
   };
 
   const chatRoom = () => {
-    navigate("/chatroom");
+    if (!product || !product.authorId) {
+      alert("판매자 정보를 불러올 수 없습니다.");
+      return;
+    }
+    navigate(`/chatroom/${product.id}/${product.authorId}`);
   };
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-20">
