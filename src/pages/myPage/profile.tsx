@@ -47,7 +47,7 @@ const Profile = () => {
         />
         <div>
           <h3 className="text-xl font-semibold text-gray-800">
-            {nickname || "사용자"}님 안녕하세요!
+            {nickname}님 안녕하세요!
           </h3>
           <p className="text-md text-gray-700">{email}</p>
         </div>
@@ -58,16 +58,6 @@ const Profile = () => {
         <div className="bg-white p-4 flex items-center justify-between border">
           <div className="flex items-center gap-4">
             <span className="font-semibold text-gray-700">프로필 수정</span>
-          </div>
-          <span className="text-gray-500">{">"}</span>
-        </div>
-
-        <div
-          className="bg-white p-4 flex items-center justify-between border cursor-pointer"
-          onClick={() => navigate("/chatList")}
-        >
-          <div className="flex items-center gap-4">
-            <span className="font-semibold text-gray-700">채팅 목록</span>
           </div>
           <span className="text-gray-500">{">"}</span>
         </div>

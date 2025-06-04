@@ -65,9 +65,9 @@ const SignupPage: React.FC = () => {
 
       await setDoc(doc(db, "users", userCredential.user.uid), {
         nickname: data.nickname,
-        userType, // "user" 또는 "seller"
+        userType,
         profileImage:
-          "https://i.postimg.cc/brX5zTtF/mike-yukhtenko-a2k-D4b0-KK4s-unsplash.jpg",
+          "https://i.postimg.cc/Lm0s77wn/kanhaiya-sharma-z59f-D2-V4-HA-unsplash.jpg",
         createdAt: serverTimestamp(),
       });
 
