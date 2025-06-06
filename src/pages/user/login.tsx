@@ -9,7 +9,8 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../../firebase/firebaseConfig";
 
 const loginSchema = z.object({
   id: z
@@ -31,7 +32,6 @@ const LoginPage: React.FC = () => {
   const setLogin = useLoginStore((state) => state.setLogin);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<"user" | "seller">("user");
 
   const {
     register,
@@ -51,8 +51,23 @@ const LoginPage: React.FC = () => {
         data.password
       );
       const user = userCredential.user;
-      setLogin(user.uid, user.email || "");
 
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        throw new Error("사용자 정보를 찾을 수 없습니다.");
+      }
+
+      const userData = userDoc.data();
+
+      setLogin(
+        user.uid,
+        user.email || "",
+        userData.nickname || "",
+        userData.profileImage || "",
+        userData.userType || "user"
+      );
       alert(`로그인되었습니다.`);
       setError("");
       navigate("/");
@@ -77,33 +92,6 @@ const LoginPage: React.FC = () => {
           <h1 className="flex justify-center text-3xl font-semibold dark:text-white">
             SignIn
           </h1>
-        </div>
-
-        <div className="mx-auto w-full max-w-[600px] text-center mb-6">
-          <div className="flex justify-center mb-6 border-b border-gray-200">
-            <button
-              type="button"
-              onClick={() => setUserType("user")}
-              className={`w-1/2 py-3 text-lg font-medium ${
-                userType === "user"
-                  ? "text-orange-500 border-b-2 border-orange-500"
-                  : "text-gray-400"
-              }`}
-            >
-              일반 회원
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserType("seller")}
-              className={`w-1/2 py-3 text-lg font-medium ${
-                userType === "seller"
-                  ? "text-orange-500 border-b-2 border-orange-500"
-                  : "text-gray-400"
-              }`}
-            >
-              판매자
-            </button>
-          </div>
         </div>
 
         <div>

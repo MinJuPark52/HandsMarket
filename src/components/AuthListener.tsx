@@ -17,16 +17,29 @@ const AuthListener = () => {
 
           let nickname = "";
           let profileImage = "/default-profile.png";
+          let userType: "user" | "seller" = "user";
 
           if (userDocSnap.exists()) {
             const data = userDocSnap.data();
             nickname = data.nickname || "";
             profileImage = data.profileImage || "/default-profile.png";
+            userType = data.userType || "user";
           }
-
-          setLogin(user.uid, user.email || "", nickname, profileImage);
+          setLogin(
+            user.uid,
+            user.email || "",
+            nickname,
+            profileImage,
+            userType
+          );
         } catch (error) {
-          setLogin(user.uid, user.email || "", "", "/default-profile.png");
+          setLogin(
+            user.uid,
+            user.email || "",
+            "",
+            "/default-profile.png",
+            "user"
+          );
         }
       } else {
         logout();

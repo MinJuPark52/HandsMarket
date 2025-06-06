@@ -6,12 +6,14 @@ interface LoginState {
   email: string;
   nickname: string;
   profileImage: string;
+  userType: "user" | "seller" | "";
   isLoggedIn: boolean;
   setLogin: (
     uid: string,
     email: string,
     nickname: string,
-    profileImage: string
+    profileImage: string,
+    userType?: "user" | "seller" | ""
   ) => void;
   logout: () => void;
 }
@@ -23,15 +25,17 @@ const useLoginStore = create<LoginState>()(
       email: "",
       nickname: "",
       profileImage: "",
+      userType: "",
       isLoggedIn: false,
-      setLogin: (uid, email, nickname, profileImage) =>
-        set({ uid, email, nickname, profileImage, isLoggedIn: true }),
+      setLogin: (uid, email, nickname, profileImage, userType = "") =>
+        set({ uid, email, nickname, profileImage, userType, isLoggedIn: true }),
       logout: () =>
         set({
           uid: "",
           email: "",
           nickname: "",
           profileImage: "",
+          userType: "",
           isLoggedIn: false,
         }),
     }),
@@ -42,6 +46,7 @@ const useLoginStore = create<LoginState>()(
         email: state.email,
         nickname: state.nickname,
         profileImage: state.profileImage,
+        userType: state.userType,
         isLoggedIn: state.isLoggedIn,
       }),
     }

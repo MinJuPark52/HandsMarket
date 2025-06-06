@@ -36,7 +36,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<"user" | "seller">("user"); // 🔹 회원 타입 상태
+  const [userType, setUserType] = useState<"user" | "seller">("user");
 
   const {
     register,

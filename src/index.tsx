@@ -21,6 +21,8 @@ import Nav from "./components/UI/Nav";
 import Wish from "./pages/myPage/wish";
 import Profile from "pages/myPage/profile";
 import Pay from "pages/order/pay";
+import ProductForm from "./pages/seller/productForm";
+import EditProfile from "./pages/myPage/edtior";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -81,6 +83,8 @@ const RoutesWrapper = ({
         <Route path="/profile" element={<Profile />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/productform" element={<ProductForm />} />
+        <Route path="/editor" element={<EditProfile />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>
     </>
