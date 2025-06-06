@@ -18,7 +18,6 @@ import Cart from "./pages/nav/cart";
 import Search from "./pages/nav/search";
 import ProductDetail from "./pages/product/productDetail";
 import Nav from "./components/UI/Nav";
-import Wish from "./pages/myPage/wish";
 import Profile from "pages/myPage/profile";
 import Pay from "pages/order/pay";
 import ProductForm from "./pages/seller/productForm";
@@ -79,7 +78,6 @@ const RoutesWrapper = ({
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/wish" element={<Wish />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/search" element={<Search />} />
