@@ -6,7 +6,7 @@ import { db } from "../../firebase/firebaseConfig";
 import { FiHeart } from "react-icons/fi";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { GoX } from "react-icons/go";
-import Category from "./category";
+import Category from "./productCategory";
 import { BeatLoader } from "react-spinners";
 
 interface ProductOptionValue {

@@ -14,10 +14,11 @@ import App from "./App";
 import AuthListener from "./components/AuthListener";
 import Login from "./pages/user/login";
 import Signup from "./pages/user/signup";
-import Cart from "./pages/nav/cart";
-import Search from "./pages/nav/search";
+import Cart from "./pages/product/cart";
+import Search from "./components/modal/search";
+import SearchResults from "pages/search/searchResult";
 import ProductDetail from "./pages/product/productDetail";
-import Nav from "./components/UI/Nav";
+import Nav from "./components/home/Nav";
 import Profile from "pages/myPage/profile";
 import Pay from "pages/order/pay";
 import ProductForm from "./pages/seller/productForm";
@@ -81,6 +82,7 @@ const RoutesWrapper = ({
         <Route path="/profile" element={<Profile />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/searchresult" element={<SearchResults />} />
         <Route path="/productform" element={<ProductForm />} />
         <Route path="/editor" element={<EditProfile />} />
         <Route path="/product/:id" element={<ProductDetail />} />
