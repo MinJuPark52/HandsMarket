@@ -1,175 +1,233 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { IoShareSocialOutline } from "react-icons/io5";
-import { useQuery } from "@tanstack/react-query";
-import { BeatLoader } from "react-spinners";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FiX } from "react-icons/fi";
 
-interface Product {
-  id: number;
-  image: string;
-  title: string;
-  description: string;
+interface ProductOptionValue {
+  label: string;
   price: number;
 }
 
-const fetchProducts = async (): Promise<Product[]> => {
-  const response = await fetch("/products.json");
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
-  }
-  return response.json();
-};
+interface ProductOption {
+  name: string;
+  label: string;
+  values: ProductOptionValue[];
+}
 
-const ProducDetailPage = () => {
-  const { id } = useParams();
+interface Product {
+  id: string;
+  image: string;
+  title: string;
+  price: number;
+  options?: ProductOption[];
+}
+
+interface CartItem {
+  product: Product;
+  options: { [key: string]: ProductOptionValue };
+  quantity: number;
+}
+
+const CartPage = () => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [tempOptions, setTempOptions] = useState<{
+    [key: string]: ProductOptionValue;
+  } | null>(null);
+
   const navigate = useNavigate();
-  const [showOptions, setShowOptions] = useState(false);
 
-  const {
-    data: products,
-    isLoading,
-    error,
-  } = useQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-  });
-
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-20">
-        <BeatLoader color="#9CA3AF" size={13} margin={3} />
-      </div>
-    );
-
-  if (error) return <p>Error loading product data.</p>;
-
-  const product = products?.find((item) => item.id === Number(id));
-  if (!product) return <p>Product not found.</p>;
-
-  const handleBuyClick = () => setShowOptions(true);
-
-  const handleCartClick = () => {
-    if (!product) return;
-
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (isLoggedIn) {
-      navigate("/cart");
-    } else {
-      navigate("/login");
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
     }
+  }, []);
 
-    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const isProductInCart = existingCart.some(
-      (item: Product) => item.id === product.id
+  const calculateItemTotal = (item: CartItem) => {
+    const optionPrice = Object.values(item.options).reduce(
+      (sum, opt) => sum + opt.price,
+      0
     );
+    return (item.product.price + optionPrice) * item.quantity;
+  };
 
-    if (!isProductInCart) {
-      existingCart.push(product);
-      localStorage.setItem("cart", JSON.stringify(existingCart));
-      alert("장바구니에 추가되었습니다");
+  const calculateTotalPrice = () => {
+    return cartItems.reduce(
+      (total, item) => total + calculateItemTotal(item),
+      0
+    );
+  };
+
+  const handleRemoveItem = (index: number) => {
+    const updatedCart = [...cartItems];
+    updatedCart.splice(index, 1);
+    setCartItems(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    if (editingIndex === index) {
+      setEditingIndex(null);
+      setTempOptions(null);
     }
   };
 
+  const handleCheckout = () => {
+    localStorage.setItem(
+      "directBuy",
+      JSON.stringify({
+        product: cartItems.map((item) => item.product),
+        combinations: cartItems,
+        totalPrice: calculateTotalPrice(),
+      })
+    );
+    navigate("/pay");
+  };
+
+  const startEditing = (index: number) => {
+    setEditingIndex(index);
+    setTempOptions({ ...cartItems[index].options });
+  };
+
+  const cancelEditing = () => {
+    setEditingIndex(null);
+    setTempOptions(null);
+  };
+
+  const saveOptions = (index: number) => {
+    if (!tempOptions) return;
+    const updatedCart = [...cartItems];
+    updatedCart[index].options = tempOptions;
+    setCartItems(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    setEditingIndex(null);
+    setTempOptions(null);
+  };
+
+  const handleOptionChange = (
+    optionName: string,
+    value: ProductOptionValue
+  ) => {
+    if (!tempOptions) return;
+    setTempOptions({ ...tempOptions, [optionName]: value });
+  };
+
   return (
-    <div className="dark:text-white min-h-screen flex justify-center px-4 mt-20">
-      <div className="w-[1020px] mt-2">
-        <div className="flex justify-center">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="h-[30rem] w-auto object-contain"
-          />
-        </div>
+    <div className="mt-20 w-full flex justify-center dark:text-white">
+      <div className="w-full max-w-[1024px]">
+        <h1 className="text-2xl font-bold mb-4">장바구니</h1>
 
-        <div className="p-4 flex flex-col">
-          <div className="w-full h-auto flex justify-between items-center">
-            <h2 className="mb-2 text-xl font-semibold">{product.title}</h2>
-            <IoShareSocialOutline className="text-xl" />
-          </div>
-
-          <p>{product.description}</p>
-          <p className="text-lg font-semibold mt-2">
-            <span>판매가</span>
-            <span className="ml-8">$</span>
-            {product.price}
-            <hr className="mt-2" />
+        {cartItems.length === 0 ? (
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            장바구니가 비어 있습니다.
           </p>
-
-          <div>
-            <select className="border px-2 w-full h-[4rem] mt-2 text-blue-500">
-              <option className="text-gray-700">할인 쿠폰 받기</option>
-              <option className="text-gray-700">첫구매 20% 할인 쿠폰</option>
-              <option className="text-gray-700">
-                즐겨찾기 할인 쿠폰 1000원
-              </option>
-            </select>
-          </div>
-          <p className="mt-4">
-            <span>배송정보</span>
-            <span className="ml-8">무료 배송</span>
-          </p>
-
-          <p className="mt-2">
-            <span>도착예정</span>
-            <span className="ml-8">도착 확률 95%</span>
-            <p className="mt-1 text-gray-400">
-              *배송 출발 이후 배송 기간은 2-3일 소요됩니다
-            </p>
-          </p>
-
-          <div className="relative">
-            {showOptions && (
-              <div className="dark:bg-gray-500 w-[988px] absolute -bottom-[2rem] transform translate-y-[0%] border bg-[#f1f1f1] rounded-lg p-6">
-                <div>
-                  <p className="mb-1 text-lg">색상</p>
-                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
-                    <option value="">색상을 선택하기</option>
-                    <option value="블랙">블랙</option>
-                    <option value="네이비">네이비</option>
-                    <option value="화이트">화이트</option>
-                  </select>
-                </div>
-                <div className="mt-4">
-                  <p className="mb-1 text-lg">사이즈</p>
-                  <select className="dark:bg-gray-300 border text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700">
-                    <option value="">사이즈를 선택하기</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                  </select>
-                </div>
-                <hr className="flex mt-[4rem]" />
-                <p className="dark:text-gray-800 flex ml-[50rem] mt-[1rem] text-2xl font-bold">
-                  총 ${product.price}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 flex z-[1]">
-            {showOptions && (
-              <div className="flex">
+        ) : (
+          <>
+            {cartItems.map((item, index) => (
+              <div
+                key={index}
+                className="mb-6 p-4 border rounded dark:bg-gray-800 bg-white relative flex gap-4"
+              >
+                {/* 삭제 버튼 오른쪽 위 */}
                 <button
-                  onClick={handleCartClick}
-                  className="rounded-lg dark:bg-gray-600 bg-white text-black dark:text-white border h-[4rem] w-[510px]"
+                  onClick={() => handleRemoveItem(index)}
+                  className="absolute top-3 right-3 text-xl text-gray-400"
+                  aria-label="삭제"
                 >
-                  장바구니
+                  <FiX />
                 </button>
+
+                <img
+                  src={item.product.image}
+                  alt={item.product.title}
+                  className="w-32 h-32 object-cover rounded"
+                />
+
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <h2 className="py-1 text-lg font-semibold">
+                      {item.product.title}
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-300 py-1">
+                      {Object.values(item.options)
+                        .map((val) => val.label)
+                        .join(" / ")}
+                    </p>
+
+                    <div className="py-1 text-gray-500">{item.quantity}개</div>
+
+                    {/* 옵션 변경 UI */}
+                    {editingIndex === index ? (
+                      <div className="mt-2 p-3 border rounded bg-gray-50 dark:bg-gray-700">
+                        {item.product.options?.map((opt) => (
+                          <div key={opt.name} className="mb-2">
+                            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-400">
+                              {opt.label}
+                            </label>
+                            <select
+                              className="w-full rounded border px-2 py-1 dark:bg-gray-800 dark:border-gray-600"
+                              value={
+                                tempOptions ? tempOptions[opt.name]?.label : ""
+                              }
+                              onChange={(e) => {
+                                const selected = opt.values.find(
+                                  (v) => v.label === e.target.value
+                                );
+                                if (selected)
+                                  handleOptionChange(opt.name, selected);
+                              }}
+                            >
+                              {opt.values.map((val) => (
+                                <option key={val.label} value={val.label}>
+                                  {val.label}{" "}
+                                  {val.price > 0 ? `(+${val.price}원)` : ""}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        ))}
+                        <div className="flex gap-3 justify-end mt-2">
+                          <button
+                            onClick={cancelEditing}
+                            className="px-4 py-2 rounded border border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                          >
+                            취소
+                          </button>
+                          <button
+                            onClick={() => saveOptions(index)}
+                            className="px-4 py-2 rounded bg-orange-500 text-white hover:opacity-90"
+                          >
+                            저장
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between mt-1">
+                        <button
+                          onClick={() => startEditing(index)}
+                          className="text-sm border border-gray-300 px-2 py-1 text-gray-700"
+                        >
+                          옵션 변경
+                        </button>
+                        <div className="mt-2 text-lg font-bold">
+                          {calculateItemTotal(item).toLocaleString()}원
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-            <button
-              onClick={handleBuyClick}
-              className={`rounded-lg bg-gray-800 text-white border px-2 h-[4rem] ${
-                showOptions ? "ml-2 w-[510px]" : "w-full"
-              }`}
-            >
-              구매하기
-            </button>
-          </div>
-        </div>
+            ))}
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={handleCheckout}
+                className="bg-orange-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 max-w-xl w-full"
+              >
+                총 {calculateTotalPrice().toLocaleString()}원 구매하기
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
-export default ProducDetailPage;
+export default CartPage;

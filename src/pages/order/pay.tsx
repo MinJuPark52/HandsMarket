@@ -51,7 +51,10 @@ const Pay: React.FC = () => {
     const directBuyRaw = localStorage.getItem("directBuy");
     if (directBuyRaw) {
       const directBuy = JSON.parse(directBuyRaw);
-      const baseProduct = directBuy.product;
+      const baseProduct = Array.isArray(directBuy.product)
+        ? directBuy.product[0]
+        : directBuy.product;
+
       const combinations = directBuy.combinations;
 
       const optionNameMap: Record<string, string> = {};
@@ -71,10 +74,13 @@ const Pay: React.FC = () => {
             })
             .join(" / ");
 
+          const optionPrice = Object.values(combo.options || {}).reduce(
+            (sum: number, opt: any) => sum + (opt?.price || 0),
+            0
+          );
+
           const price =
-            combo.price !== undefined
-              ? combo.price
-              : baseProduct.price * (combo.quantity || 1);
+            (baseProduct.price + optionPrice) * (combo.quantity || 1);
 
           return {
             name: baseProduct.title,

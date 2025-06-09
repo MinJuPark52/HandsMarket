@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "../../firebase/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import { BeatLoader } from "react-spinners";
+import { MdErrorOutline } from "react-icons/md";
 
 interface Product {
   id: string;
@@ -31,22 +32,6 @@ const Products = () => {
     queryFn: fetchProducts,
   });
 
-  // const isLoggedIn = localStorage.getItem("user");
-
-  // const handleAddToWishlist = (product: Product) => {
-  //   if (!isLoggedIn) {
-  //     navigate("/login");
-  //     return;
-  //   }
-  //   let wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-  //   if (!wishlist.find((item: Product) => item.id === product.id)) {
-  //     wishlist.push(product);
-  //     localStorage.setItem("wishlist", JSON.stringify(wishlist));
-  //   }
-  //   alert("찜한 상품에 추가했습니다");
-  //   navigate("/wishlist");
-  // };
-
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-20">
@@ -55,14 +40,20 @@ const Products = () => {
     );
 
   if (error)
-    return <p className="text-center text-lg">Error loading products.</p>;
+    return (
+      <div className="flex justify-center items-center mt-20">
+        <MdErrorOutline color="#9CA3AF" size={24} />
+        <span className="ml-2 text-gray-600">에러가 발생했습니다.</span>
+      </div>
+    );
+
   if (!productList || productList.length === 0)
-    return <p className="text-center text-lg">No products available.</p>;
+    return <p className="text-center text-lg">제품이 없습니다.</p>;
 
   return (
     <div className="flex justify-center">
       <div className="mt-2 mx-auto w-full min-w-[600px] max-w-[1024px]">
-        <h1 className="text-xl mb-4 mt-2 font-medium">요즘 뜨는 인기 작품</h1>
+        <h1 className="text-xl mb-4 mt-2 font-medium">방금 등록된 아이템</h1>
         <div className="grid grid-cols-[repeat(4,_1fr)] gap-4">
           {productList.map((product: Product) => (
             <div

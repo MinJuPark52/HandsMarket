@@ -83,10 +83,12 @@ const SignupPage: React.FC = () => {
     <div className="mt-[4rem]">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mx-auto w-full max-w-[1024px] text-center my-[10px] py-4"
+        className="mx-auto w-[1024px] text-center my-[10px] py-4"
       >
-        <div className="w-full max-w-[600px] mx-auto text-left mb-4">
-          <h1 className="text-3xl font-semibold dark:text-white">SignUp</h1>
+        <div className="-w-[600px] mx-auto text-left mb-4">
+          <h1 className="flex justify-center text-3xl font-semibold dark:text-white">
+            SignUp
+          </h1>
         </div>
 
         <div className="w-[600px] mx-auto flex justify-center mb-6 border-b border-gray-200">

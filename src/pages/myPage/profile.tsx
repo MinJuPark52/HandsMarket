@@ -93,12 +93,16 @@ const Profile = () => {
               <GoChevronRight size={20} />
             </span>
           </Link>
-          <div className="bg-white p-4 flex items-center justify-between border-b">
+
+          <Link
+            to="/productlist"
+            className="bg-white p-4 flex items-center justify-between border-b"
+          >
             <span className="font-semibold text-gray-700">등록한 상품</span>
             <span className="text-gray-600">
               <GoChevronRight size={20} />
             </span>
-          </div>
+          </Link>
         </>
       )}
 

@@ -70,7 +70,9 @@ const LoginPage: React.FC = () => {
       );
       alert(`로그인되었습니다.`);
       setError("");
-      navigate("/");
+      const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+      localStorage.removeItem("redirectAfterLogin");
+      navigate(redirectPath);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError("로그인에 실패했습니다. 다시 시도해 주세요.");
@@ -85,10 +87,10 @@ const LoginPage: React.FC = () => {
   return (
     <div className="mt-[5rem]">
       <form
-        className="mx-auto w-full max-w-[1024px] text-center"
+        className="mx-auto w-[1024px] text-center"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="w-full max-w-[600px] mx-auto text-left mb-4">
+        <div className="-w-[600px] mx-auto text-left mb-4">
           <h1 className="flex justify-center text-3xl font-semibold dark:text-white">
             SignIn
           </h1>

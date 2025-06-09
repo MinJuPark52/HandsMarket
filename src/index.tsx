@@ -23,6 +23,7 @@ import Profile from "pages/myPage/profile";
 import Pay from "pages/order/pay";
 import ProductForm from "./pages/seller/productForm";
 import EditProfile from "./pages/myPage/edtior";
+import ProductList from "pages/seller/productList";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -83,7 +84,8 @@ const RoutesWrapper = ({
         <Route path="/pay" element={<Pay />} />
         <Route path="/search" element={<Search />} />
         <Route path="/searchresult" element={<SearchResults />} />
-        <Route path="/productform" element={<ProductForm />} />
+        <Route path="/productform/:productId" element={<ProductForm />} />
+        <Route path="/productlist" element={<ProductList />} />
         <Route path="/editor" element={<EditProfile />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>

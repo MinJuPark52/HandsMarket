@@ -8,6 +8,7 @@ import { IoShareSocialOutline } from "react-icons/io5";
 import { GoX } from "react-icons/go";
 import Category from "./productCategory";
 import { BeatLoader } from "react-spinners";
+import useLoginStore from "../../stores/useLoginStore";
 
 interface ProductOptionValue {
   label: string;
@@ -85,6 +86,8 @@ const fetchProductById = async (id: string): Promise<Product | null> => {
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { uid } = useLoginStore();
+  const isLoggedIn = Boolean(uid);
 
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: ProductOptionValue;
@@ -151,8 +154,8 @@ const ProductDetailPage = () => {
   const handleCartClick = () => {
     if (!product || selectedCombinations.length === 0) return;
 
-    const isLoggedIn = Boolean(localStorage.getItem("userToken"));
     if (!isLoggedIn) {
+      localStorage.setItem("redirectAfterLogin", window.location.pathname);
       navigate("/login");
       return;
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { db, storage } from "../../firebase/firebaseConfig";
-import { collection, addDoc, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,11 @@ interface OptionGroup {
   values: OptionValue[];
 }
 
-const ProductForm = () => {
+interface ProductFormProps {
+  productId?: string;
+}
+
+const ProductForm = ({ productId }: ProductFormProps) => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState<number>(0);
@@ -37,44 +41,76 @@ const ProductForm = () => {
 
   const [options, setOptions] = useState<OptionGroup[]>([
     {
-      label: "",
-      name: "",
-      values: [{ label: "", price: 0 }],
+      label: "사이즈",
+      name: "size",
+      values: [{ label: "소형: 10~12송이", price: 0 }],
     },
   ]);
 
   const authorId = "author_015";
 
+  // 상품 불러오기 (수정용)
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) return;
+
+      try {
+        const productRef = doc(db, "product", productId);
+        const productSnap = await getDoc(productRef);
+
+        if (productSnap.exists()) {
+          const data = productSnap.data();
+          setTitle(data.title || "");
+          setPrice(data.price || 0);
+          setTags((data.tags || []).join(", "));
+          setOptions(data.options || []);
+          setMainImagePreview(data.image || "");
+
+          const authorRef = doc(db, "authors", data.authorId);
+          const authorSnap = await getDoc(authorRef);
+          if (authorSnap.exists()) {
+            const author = authorSnap.data();
+            setAuthorName(author.name || "");
+            setDetailImagePreview(author.detailImages || "");
+            setProfileImagePreview(author.profileImage || "");
+          }
+        }
+      } catch (err) {
+        console.error("상품 로딩 실패:", err);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
+  // 메인 이미지 프리뷰 업데이트
   useEffect(() => {
     if (mainImage) {
       const previewUrl = URL.createObjectURL(mainImage);
       setMainImagePreview(previewUrl);
       return () => URL.revokeObjectURL(previewUrl);
-    } else {
-      setMainImagePreview(null);
     }
   }, [mainImage]);
 
+  // 상세 이미지 프리뷰 업데이트
   useEffect(() => {
     if (detailImage) {
       const previewUrl = URL.createObjectURL(detailImage);
       setDetailImagePreview(previewUrl);
       return () => URL.revokeObjectURL(previewUrl);
-    } else {
-      setDetailImagePreview(null);
     }
   }, [detailImage]);
 
+  // 프로필 이미지 프리뷰 업데이트
   useEffect(() => {
     if (profileImage) {
       const previewUrl = URL.createObjectURL(profileImage);
       setProfileImagePreview(previewUrl);
       return () => URL.revokeObjectURL(previewUrl);
-    } else {
-      setProfileImagePreview(null);
     }
   }, [profileImage]);
 
+  // 옵션 그룹 변경
   const handleOptionGroupChange = (
     index: number,
     field: "label" | "name",
@@ -85,6 +121,7 @@ const ProductForm = () => {
     setOptions(newOptions);
   };
 
+  // 옵션 값 변경
   const handleOptionValueChange = (
     groupIndex: number,
     valueIndex: number,
@@ -100,6 +137,7 @@ const ProductForm = () => {
     setOptions(newOptions);
   };
 
+  // 옵션 그룹 추가
   const addOptionGroup = () => {
     setOptions([
       ...options,
@@ -107,17 +145,20 @@ const ProductForm = () => {
     ]);
   };
 
+  // 옵션 그룹 삭제
   const removeOptionGroup = (index: number) => {
     const newOptions = options.filter((_, i) => i !== index);
     setOptions(newOptions);
   };
 
+  // 옵션 값 추가
   const addOptionValue = (groupIndex: number) => {
     const newOptions = [...options];
     newOptions[groupIndex].values.push({ label: "", price: 0 });
     setOptions(newOptions);
   };
 
+  // 옵션 값 삭제
   const removeOptionValue = (groupIndex: number, valueIndex: number) => {
     const newOptions = [...options];
     newOptions[groupIndex].values = newOptions[groupIndex].values.filter(
@@ -126,70 +167,98 @@ const ProductForm = () => {
     setOptions(newOptions);
   };
 
+  // 폼 제출 (등록 및 수정)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mainImage || !detailImage) {
-      alert("이미지를 모두 업로드해주세요.");
+
+    const isEdit = Boolean(productId);
+    const id = isEdit ? productId! : uuidv4();
+
+    if (!mainImage && !mainImagePreview) {
+      alert("대표 이미지를 업로드해주세요.");
+      return;
+    }
+    if (!detailImage && !detailImagePreview) {
+      alert("상세 이미지를 업로드해주세요.");
       return;
     }
 
-    const productId = uuidv4();
-
     try {
-      const mainImageRef = ref(storage, `products/${productId}/main`);
-      const detailImageRef = ref(storage, `authors/${authorId}/detail`);
-      const profileImageRef = ref(storage, `authors/${authorId}/profile`);
-
-      await uploadBytes(mainImageRef, mainImage);
-      await uploadBytes(detailImageRef, detailImage);
-
-      if (profileImage) {
-        await uploadBytes(profileImageRef, profileImage);
+      // 이미지 업로드 (새로 선택된 경우만)
+      let mainImageUrl = mainImagePreview || "";
+      if (mainImage) {
+        const mainImageRef = ref(storage, `products/${id}/main`);
+        await uploadBytes(mainImageRef, mainImage);
+        mainImageUrl = await getDownloadURL(mainImageRef);
+        setMainImagePreview(mainImageUrl);
       }
-      const mainImageUrl = await getDownloadURL(mainImageRef);
-      const detailImageUrl = await getDownloadURL(detailImageRef);
-      const profileImageUrl = profileImage
-        ? await getDownloadURL(profileImageRef)
-        : "";
 
+      let detailImageUrl = detailImagePreview || "";
+      if (detailImage) {
+        const detailImageRef = ref(storage, `authors/${authorId}/detail`);
+        await uploadBytes(detailImageRef, detailImage);
+        detailImageUrl = await getDownloadURL(detailImageRef);
+        setDetailImagePreview(detailImageUrl);
+      }
+
+      let profileImageUrl = profileImagePreview || "";
+      if (profileImage) {
+        const profileImageRef = ref(storage, `authors/${authorId}/profile`);
+        await uploadBytes(profileImageRef, profileImage);
+        profileImageUrl = await getDownloadURL(profileImageRef);
+        setProfileImagePreview(profileImageUrl);
+      }
+
+      // 작가 정보 저장
       await setDoc(doc(db, "authors", authorId), {
         name: authorName,
         profileImage: profileImageUrl,
         detailImages: detailImageUrl,
       });
 
-      await addDoc(collection(db, "product"), {
+      // 상품 정보 저장
+      const productData = {
         title,
         price,
         image: mainImageUrl,
         authorId,
         tags: tags.split(",").map((tag) => tag.trim()),
         options,
-      });
+      };
 
-      alert("상품이 성공적으로 등록되었습니다!");
+      if (isEdit) {
+        await updateDoc(doc(db, "product", id), productData);
+        alert("상품이 성공적으로 수정되었습니다!");
+      } else {
+        await setDoc(doc(db, "product", id), productData);
+        alert("상품이 성공적으로 등록되었습니다!");
+      }
+
       navigate("/");
 
-      setTitle("");
-      setPrice(0);
-      setAuthorName("");
-      setTags("");
-      setMainImage(null);
-      setDetailImage(null);
-      setProfileImage(null);
-      setMainImagePreview(null);
-      setDetailImagePreview(null);
-      setProfileImagePreview(null);
-      setOptions([
-        {
-          label: "사이즈",
-          name: "size",
-          values: [{ label: "소형: 10~12송이", price: 0 }],
-        },
-      ]);
+      // 초기화 (등록 후만)
+      if (!isEdit) {
+        setTitle("");
+        setPrice(0);
+        setAuthorName("");
+        setTags("");
+        setMainImage(null);
+        setDetailImage(null);
+        setProfileImage(null);
+        setMainImagePreview(null);
+        setDetailImagePreview(null);
+        setProfileImagePreview(null);
+        setOptions([
+          {
+            label: "사이즈",
+            name: "size",
+            values: [{ label: "소형: 10~12송이", price: 0 }],
+          },
+        ]);
+      }
     } catch (err) {
-      console.error("상품 등록 실패:", err);
-      alert("등록 중 오류가 발생했습니다.");
+      console.error("상품 등록/수정 실패:", err);
+      alert("처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -198,7 +267,9 @@ const ProductForm = () => {
       onSubmit={handleSubmit}
       className="w-[1024px] mx-auto mt-20 space-y-5"
     >
-      <h1 className="text-3xl font-bold text-gray-800">상품 등록</h1>
+      <h1 className="text-3xl font-bold text-gray-800">
+        {productId ? "상품 수정" : "상품 등록"}
+      </h1>
 
       <div className="shadow-sm rounded-lg p-8 space-y-10 border border-gray-200">
         {/* 상품 정보 */}
@@ -447,9 +518,9 @@ const ProductForm = () => {
         <div className="text-right">
           <button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg"
+            className="bg-blue-600 text-white py-3 rounded-lg w-full hover:bg-blue-700 transition"
           >
-            상품 등록하기
+            {productId ? "상품 수정하기" : "상품 등록하기"}
           </button>
         </div>
       </div>

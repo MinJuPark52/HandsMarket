@@ -92,7 +92,6 @@ const EditProfilePage: React.FC = () => {
       navigate("/");
     } catch (error: any) {
       console.error("프로필 수정 오류:", error.message);
-      alert("수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -100,10 +99,10 @@ const EditProfilePage: React.FC = () => {
     <div className="mt-[4rem] flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-[1024px] text-center my-[10px] py-4"
+        className="w-[1024px] text-center my-[10px] py-4"
       >
         <div className="w-full max-w-[600px] mx-auto mb-4">
-          <h1 className="text-3xl font-semibold dark:text-white text-center">
+          <h1 className="text-2xl font-semibold dark:text-white text-center">
             프로필 설정
           </h1>
         </div>

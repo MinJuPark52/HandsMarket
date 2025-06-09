@@ -4,20 +4,14 @@ import Slide from "./components/home/Slide";
 import HomeCategory from "./components/home/HomeCategory";
 
 const categories = [
-  { id: 1, name: "패션", icon: "👗" },
-  { id: 2, name: "전자기기", icon: "📱" },
-  { id: 3, name: "가구", icon: "🛋️" },
-  { id: 4, name: "뷰티", icon: "💄" },
+  { id: 1, name: "홈" },
+  { id: 2, name: "베스트" },
+  { id: 3, name: "지역 상품" },
+  { id: 4, name: "핸드메이드" },
 ];
 
 const App = () => {
-  const handleSelect = (category: {
-    id: number;
-    name: string;
-    icon: string;
-  }) => {
-    alert(`선택된 카테고리: ${category.name}`);
-  };
+  const handleSelect = (category: { id: number; name: string }) => {};
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white">

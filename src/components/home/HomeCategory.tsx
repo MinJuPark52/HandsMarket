@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Category {
   id: number;
@@ -11,7 +11,15 @@ interface Props {
 }
 
 const CategoryList: React.FC<Props> = ({ categories, onSelect }) => {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(
+    categories.length > 0 ? categories[0].id : null
+  );
+
+  useEffect(() => {
+    if (categories.length > 0 && onSelect) {
+      onSelect(categories[0]);
+    }
+  }, [categories, onSelect]);
 
   const handleClick = (category: Category) => {
     setSelectedId(category.id);
@@ -27,13 +35,13 @@ const CategoryList: React.FC<Props> = ({ categories, onSelect }) => {
             key={category.id}
             onClick={() => handleClick(category)}
             className={`
-              flex flex-col items-center justify-center gap-2 w-1/4
+              flex flex-col items-center justify-center w-1/4
               py-4 font-semibold text-center
-              transition-colors duration-300
+              transition-colors 
               ${
                 isSelected
-                  ? "text-gray-600 border-b"
-                  : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                  ? "text-gray-700 border-b border-gray-600"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-600"
               }
               cursor-pointer
             `}
