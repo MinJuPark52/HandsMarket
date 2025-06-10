@@ -251,12 +251,12 @@ const ProductDetailPage = () => {
               *배송 출발 이후 배송 기간은 2-3일 소요됩니다
             </p>
 
-            <div className="dark:bg-gray-500 mt-4 border bg-[#fefefe] rounded-lg px-4 py-2">
+            <div className="dark:bg-gray-600 mt-4 border bg-[#fefefe] rounded-lg px-4 py-2">
               {product.options?.map((option) => (
-                <div key={option.name} className="mt-2">
-                  <p className="mb-1 text-lg">{option.label}</p>
+                <div key={option.name} className="mt-2 mb-1">
+                  <p className="text-lg">{option.label}</p>
                   <select
-                    className="dark:bg-gray-300 border bg-[#f3f3f3] text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700"
+                    className="dark:bg-gray-300 border bg-[#f3f3f3] text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700 mb-2"
                     value={selectedOptions[option.name]?.label || ""}
                     onChange={(e) =>
                       handleOptionChange(option.name, e.target.value)
@@ -337,7 +337,7 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            <div className="mt-2 flex z-[1] gap-4">
+            <div className="mt-3 flex z-[1] gap-4">
               <button
                 onClick={handleCartClick}
                 className="flex-1 rounded-lg bg-white dark:bg-gray-600 text-black dark:text-white border h-[4rem] font-semibold hover:opacity-90 transition"

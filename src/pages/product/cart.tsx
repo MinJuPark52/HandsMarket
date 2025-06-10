@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiX } from "react-icons/fi";
+import { FaBasketShopping } from "react-icons/fa6";
 
 interface ProductOptionValue {
   label: string;
@@ -115,9 +116,12 @@ const CartPage = () => {
         <h1 className="text-2xl font-bold mb-4">장바구니</h1>
 
         {cartItems.length === 0 ? (
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            장바구니가 비어 있습니다.
-          </p>
+          <div className="flex flex-col items-center justify-center h-60 text-gray-600 dark:text-gray-400">
+            <div className="text-5xl mb-4">
+              <FaBasketShopping />
+            </div>
+            <p className="text-xl">장바구니가 비어 있습니다.</p>
+          </div>
         ) : (
           <>
             {cartItems.map((item, index) => (
@@ -128,7 +132,7 @@ const CartPage = () => {
                 {/* 삭제 버튼 오른쪽 위 */}
                 <button
                   onClick={() => handleRemoveItem(index)}
-                  className="absolute top-3 right-3 text-xl text-gray-400"
+                  className="absolute top-3 right-3 text-xl text-gray-400 dark:text-gray-300"
                   aria-label="삭제"
                 >
                   <FiX />
@@ -151,14 +155,14 @@ const CartPage = () => {
                         .join(" / ")}
                     </p>
 
-                    <div className="py-1 text-gray-500">{item.quantity}개</div>
+                    <div className="py-1 text-gray-400">{item.quantity}개</div>
 
                     {/* 옵션 변경 UI */}
                     {editingIndex === index ? (
-                      <div className="mt-2 p-3 border rounded bg-gray-50 dark:bg-gray-700">
+                      <div className="mt-2 p-3 border rounded bg-gray-50 dark:bg-gray-800">
                         {item.product.options?.map((opt) => (
                           <div key={opt.name} className="mb-2">
-                            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-400">
+                            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-300">
                               {opt.label}
                             </label>
                             <select
@@ -186,7 +190,7 @@ const CartPage = () => {
                         <div className="flex gap-3 justify-end mt-2">
                           <button
                             onClick={cancelEditing}
-                            className="px-4 py-2 rounded border border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                            className="px-4 py-2 rounded border border-gray-400 hover:bg-gray-200 dark:border-gray-500 dark:hover:bg-gray-600"
                           >
                             취소
                           </button>
@@ -202,7 +206,7 @@ const CartPage = () => {
                       <div className="flex items-center justify-between mt-1">
                         <button
                           onClick={() => startEditing(index)}
-                          className="text-sm border border-gray-300 px-2 py-1 text-gray-700"
+                          className="text-sm border border-gray-300 px-2 py-1 text-gray-700 dark:text-gray-300"
                         >
                           옵션 변경
                         </button>

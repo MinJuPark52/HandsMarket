@@ -72,7 +72,7 @@ const SearchPageModal: React.FC<SearchPageModalProps> = ({ onClose }) => {
         <div className="flex items-center w-full relative">
           <input
             type="text"
-            className="h-[3.5rem] w-full px-6 rounded-lg text-base border bg-gray-100"
+            className="h-[3.5rem] w-full px-6 rounded-lg text-base border bg-gray-100 dark:text-gray-700"
             placeholder="아이템을 검색해보세요"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -93,7 +93,7 @@ const SearchPageModal: React.FC<SearchPageModalProps> = ({ onClose }) => {
             {filteredKeywords.map((keyword, index) => (
               <li
                 key={index}
-                className="px-4 py-4 flex items-center border-b border-gray-100 cursor-pointer hover:bg-gray-50"
+                className="px-4 py-4 flex items-center border-b border-gray-100 cursor-pointer hover:bg-gray-50 dark:text-gray-600"
                 onClick={() => handleSearchSelect(keyword)}
               >
                 <FiSearch className="mr-2 text-gray-600 text-xl" />

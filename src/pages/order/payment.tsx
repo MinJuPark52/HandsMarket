@@ -63,7 +63,7 @@ const Payment: React.FC<PaymentPageProps> = ({
     const merchantCode = process.env.REACT_APP_PORTONE_MERCHANT_ID;
 
     if (!IMP || !merchantCode) {
-      alert("결제 모듈이 로드되지 않았거나 가맹점 코드가 없습니다.");
+      console.log("결제 모듈이 로드되지 않았거나 가맹점 코드가 없습니다.");
       return;
     }
 
@@ -96,10 +96,10 @@ const Payment: React.FC<PaymentPageProps> = ({
           });
           alert("결제 성공!");
         } catch (err) {
-          alert("결제는 성공했지만 저장에 실패했습니다.");
+          console.log("결제는 성공했지만 저장에 실패했습니다.");
         }
       } else {
-        alert(`결제 실패: ${rsp.error_msg}`);
+        alert(`${rsp.error_msg}`);
       }
     });
   };

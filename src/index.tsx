@@ -15,7 +15,7 @@ import AuthListener from "./components/AuthListener";
 import Login from "./pages/user/login";
 import Signup from "./pages/user/signup";
 import Cart from "./pages/product/cart";
-import Search from "./components/modal/search";
+// import Search from "./components/modal/search";
 import SearchResults from "pages/search/searchResult";
 import ProductDetail from "./pages/product/productDetail";
 import Nav from "./components/home/Nav";
@@ -24,6 +24,7 @@ import Pay from "pages/order/pay";
 import ProductForm from "./pages/seller/productForm";
 import EditProfile from "./pages/myPage/edtior";
 import ProductList from "pages/seller/productList";
+// import Reviews from "./pages/myPage/reviews";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -82,7 +83,8 @@ const RoutesWrapper = ({
         <Route path="/cart" element={<Cart />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/pay" element={<Pay />} />
-        <Route path="/search" element={<Search />} />
+        {/* <Route path="/search" element={<Search />} /> */}
+        {/* <Route path="/reviews" element={<Reviews />} /> */}
         <Route path="/searchresult" element={<SearchResults />} />
         <Route path="/productform/:productId" element={<ProductForm />} />
         <Route path="/productlist" element={<ProductList />} />

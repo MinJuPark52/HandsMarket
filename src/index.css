@@ -11,21 +11,21 @@ body {
 /* 시스템에 설정에 따라 자동 */
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: black;
+    background-color: #1f2937;
     color: white;
   }
 
   html {
-    background-color: #2d3748;
+    background-color: #1f2937;
   }
 }
 
 /* 수동 다크모드 */
 html.dark {
-  background-color: #2d3748;
+  background-color: #1f2937;
 }
 
 html.dark body {
-  background-color: black;
+  background-color: #1f2937;
   color: white;
 }

@@ -49,7 +49,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
   const authorId = "author_015";
 
-  // 상품 불러오기 (수정용)
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) return;
@@ -83,7 +82,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     fetchProduct();
   }, [productId]);
 
-  // 메인 이미지 프리뷰 업데이트
   useEffect(() => {
     if (mainImage) {
       const previewUrl = URL.createObjectURL(mainImage);
@@ -92,7 +90,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     }
   }, [mainImage]);
 
-  // 상세 이미지 프리뷰 업데이트
   useEffect(() => {
     if (detailImage) {
       const previewUrl = URL.createObjectURL(detailImage);
@@ -101,7 +98,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     }
   }, [detailImage]);
 
-  // 프로필 이미지 프리뷰 업데이트
   useEffect(() => {
     if (profileImage) {
       const previewUrl = URL.createObjectURL(profileImage);
@@ -110,7 +106,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     }
   }, [profileImage]);
 
-  // 옵션 그룹 변경
   const handleOptionGroupChange = (
     index: number,
     field: "label" | "name",
@@ -121,7 +116,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     setOptions(newOptions);
   };
 
-  // 옵션 값 변경
   const handleOptionValueChange = (
     groupIndex: number,
     valueIndex: number,
@@ -137,7 +131,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     setOptions(newOptions);
   };
 
-  // 옵션 그룹 추가
   const addOptionGroup = () => {
     setOptions([
       ...options,
@@ -145,20 +138,17 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     ]);
   };
 
-  // 옵션 그룹 삭제
   const removeOptionGroup = (index: number) => {
     const newOptions = options.filter((_, i) => i !== index);
     setOptions(newOptions);
   };
 
-  // 옵션 값 추가
   const addOptionValue = (groupIndex: number) => {
     const newOptions = [...options];
     newOptions[groupIndex].values.push({ label: "", price: 0 });
     setOptions(newOptions);
   };
 
-  // 옵션 값 삭제
   const removeOptionValue = (groupIndex: number, valueIndex: number) => {
     const newOptions = [...options];
     newOptions[groupIndex].values = newOptions[groupIndex].values.filter(
@@ -167,7 +157,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     setOptions(newOptions);
   };
 
-  // 폼 제출 (등록 및 수정)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -184,7 +173,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     }
 
     try {
-      // 이미지 업로드 (새로 선택된 경우만)
       let mainImageUrl = mainImagePreview || "";
       if (mainImage) {
         const mainImageRef = ref(storage, `products/${id}/main`);
@@ -209,14 +197,12 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         setProfileImagePreview(profileImageUrl);
       }
 
-      // 작가 정보 저장
       await setDoc(doc(db, "authors", authorId), {
         name: authorName,
         profileImage: profileImageUrl,
         detailImages: detailImageUrl,
       });
 
-      // 상품 정보 저장
       const productData = {
         title,
         price,
@@ -236,7 +222,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
       navigate("/");
 
-      // 초기화 (등록 후만)
       if (!isEdit) {
         setTitle("");
         setPrice(0);
@@ -274,13 +259,13 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       <div className="shadow-sm rounded-lg p-8 space-y-10 border border-gray-200">
         {/* 상품 정보 */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 기본 정보
           </h2>
 
           {/* 프로필 이미지 */}
           <div className="w-40 mb-4">
-            <label className="block font-medium text-gray-700 mb-1">
+            <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
               프로필
             </label>
             <label
@@ -310,50 +295,50 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
           <div className="space-y-4">
             <div>
-              <label className="block font-medium text-gray-700 mb-1">
+              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
                 상품명
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none"
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none dark:text-gray-600"
                 placeholder="예: 레드로즈 부케"
               />
             </div>
             <div>
-              <label className="block font-medium text-gray-700 mb-1">
+              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
                 판매가
               </label>
               <input
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
                 placeholder="예: 32000"
               />
             </div>
             <div>
-              <label className="block font-medium text-gray-700 mb-1">
+              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
                 판매자명
               </label>
               <input
                 type="text"
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
                 placeholder="판매자 또는 브랜드 이름"
               />
             </div>
             <div>
-              <label className="block font-medium text-gray-700 mb-1">
+              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
                 태그
               </label>
               <input
                 type="text"
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
                 placeholder="예: 꽃, 부케, 로즈 (쉼표로 구분)"
               />
             </div>
@@ -362,13 +347,15 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
         {/* 이미지 업로드 */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 이미지
           </h2>
           <div className="flex space-x-6">
             {/* 메인 이미지 */}
             <div className="w-40">
-              <label className="block mb-2 text-gray-600">대표 이미지</label>
+              <label className="block mb-2 text-gray-600 dark:text-gray-300">
+                대표 이미지
+              </label>
               <label
                 htmlFor="main-upload"
                 className="relative w-40 h-40 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition"
@@ -396,7 +383,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
             {/* 상세 이미지 */}
             <div className="w-40">
-              <label className="block mb-2 text-gray-600">상세 이미지</label>
+              <label className="block mb-2 text-gray-600 dark:text-gray-300">
+                상세 이미지
+              </label>
               <label
                 htmlFor="detail-upload"
                 className="relative w-40 h-40 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition"
@@ -426,7 +415,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
         {/* 옵션 */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 옵션
           </h2>
           {options.map((group, groupIndex) => (
@@ -439,7 +428,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                   onChange={(e) =>
                     handleOptionGroupChange(groupIndex, "label", e.target.value)
                   }
-                  className="flex-1 border rounded px-2 py-2 focus:outline-none"
+                  className="flex-1 border rounded px-2 py-2 focus:outline-none dark:text-gray-600"
                 />
                 <input
                   type="text"
@@ -448,7 +437,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                   onChange={(e) =>
                     handleOptionGroupChange(groupIndex, "name", e.target.value)
                   }
-                  className="flex-1 border rounded px-2 py-2 focus:outline-none"
+                  className="flex-1 border rounded px-2 py-2 focus:outline-none dark:text-gray-600"
                 />
                 <button
                   onClick={() => removeOptionGroup(groupIndex)}
@@ -471,7 +460,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                         e.target.value
                       )
                     }
-                    className="flex-1 border rounded p-2 focus:outline-none"
+                    className="flex-1 border rounded p-2 focus:outline-none dark:text-gray-600"
                   />
                   <input
                     type="number"
@@ -485,7 +474,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                         Number(e.target.value)
                       )
                     }
-                    className="flex-1 border rounded p-2 focus:outline-none"
+                    className="flex-1 border rounded p-2 focus:outline-none dark:text-gray-600"
                   />
                   <button
                     type="button"
@@ -518,7 +507,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         <div className="text-right">
           <button
             type="submit"
-            className="bg-blue-600 text-white py-3 rounded-lg w-full hover:bg-blue-700 transition"
+            className="bg-orange-500 text-white py-3 rounded-lg w-full hover:bg-orange-600 transition"
           >
             {productId ? "상품 수정하기" : "상품 등록하기"}
           </button>

@@ -91,14 +91,14 @@ const SignupPage: React.FC = () => {
           </h1>
         </div>
 
-        <div className="w-[600px] mx-auto flex justify-center mb-6 border-b border-gray-200">
+        <div className="w-[600px] mx-auto flex justify-center mb-6">
           <button
             type="button"
             onClick={() => setUserType("user")}
             className={`w-1/2 py-3 text-lg font-medium ${
               userType === "user"
                 ? "text-orange-500 border-b-2 border-orange-500"
-                : "text-gray-400"
+                : "text-gray-400 border-b border-gray-400"
             }`}
           >
             일반 회원
@@ -109,7 +109,7 @@ const SignupPage: React.FC = () => {
             className={`w-1/2 py-3 text-lg font-medium ${
               userType === "seller"
                 ? "text-orange-500 border-b-2 border-orange-500"
-                : "text-gray-400"
+                : "text-gray-400 border-b border-gray-400"
             }`}
           >
             판매자

@@ -72,12 +72,15 @@ const Profile = () => {
       {/* 사용자 */}
       {userType === "user" && (
         <>
-          <div className="bg-white p-4 flex items-center justify-between border-b">
-            <span className="font-semibold text-gray-700">결제 목록</span>
+          <Link
+            to="/reviews"
+            className="bg-white p-4 flex items-center justify-between border-b"
+          >
+            <span className="font-semibold text-gray-700">리뷰 관리</span>
             <span className="text-gray-600">
               <GoChevronRight size={20} />
             </span>
-          </div>
+          </Link>
         </>
       )}
 

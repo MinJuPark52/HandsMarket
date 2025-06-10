@@ -98,7 +98,7 @@ const LoginPage: React.FC = () => {
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md dark:text-gray-700"
             placeholder="이메일"
             {...register("id")}
           />
@@ -109,7 +109,7 @@ const LoginPage: React.FC = () => {
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-blue-500 focus:outline-none"
+            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md dark:text-gray-700"
             placeholder="비밀번호"
             type="password"
             {...register("password")}
@@ -131,8 +131,13 @@ const LoginPage: React.FC = () => {
 
         <div className="w-full max-w-[600px] mx-auto text-left">
           <div className="dark:text-white text-sm no-underline mt-4">
-            <span className="text-gray-600">계정이 없으신가요?</span>
-            <Link to="/signup" className="px-2 underline text-gray-700">
+            <span className="text-gray-600 dark:text-gray-400">
+              계정이 없으신가요?
+            </span>
+            <Link
+              to="/signup"
+              className="px-2 underline text-gray-700 dark:text-gray-400"
+            >
               회원가입
             </Link>
           </div>

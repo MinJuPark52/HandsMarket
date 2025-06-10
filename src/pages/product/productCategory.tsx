@@ -39,8 +39,8 @@ const Category: React.FC<CategoryProps> = ({ product }) => {
             key={tab.key}
             className={`flex-1 p-4 ${
               activeTab === tab.key
-                ? "text-gray-600 border-b-4 border-gray-700 font-semibold"
-                : "text-gray-600 hover:bg-gray-200"
+                ? "text-gray-600 border-b-4 border-gray-700 dark:border-gray-400 font-semibold dark:text-gray-300"
+                : "text-gray-600 hover:bg-gray-300 dark:text-gray-500"
             }`}
             onClick={() => setActiveTab(tab.key)}
           >

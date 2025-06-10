@@ -14,7 +14,7 @@ interface Product {
 }
 
 const fetchProducts = async (): Promise<Product[]> => {
-  const querySnapshot = await getDocs(collection(db, "product")); // 'product' 컬렉션에서 데이터를 가져옴
+  const querySnapshot = await getDocs(collection(db, "product"));
   const products: Product[] = querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),

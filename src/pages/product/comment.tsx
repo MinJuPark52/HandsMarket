@@ -122,7 +122,9 @@ export default function CommentBox({ postId }: CommentBoxProps) {
           </div>
         )}
         {!isLoading && comments?.length === 0 && (
-          <p className="text-gray-500">행운의 첫 댓글을 남겨보세요!</p>
+          <p className="text-gray-500 dark:text-gray-300">
+            행운의 첫 댓글을 남겨보세요!
+          </p>
         )}
         {comments?.map((c) => (
           <li
