@@ -9,9 +9,11 @@ const AuthListener = () => {
   const logout = useLoginStore((state) => state.logout);
 
   useEffect(() => {
+    // Firebase 인증 상태 변경 감지
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
+          // Firestore에서 사용자 정보 문서 가져오기
           const userDocRef = doc(db, "users", user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
@@ -19,6 +21,7 @@ const AuthListener = () => {
           let profileImage = "/default-profile.png";
           let userType: "user" | "seller" = "user";
 
+          // 사용자 문서가 존재하면 정보 추출
           if (userDocSnap.exists()) {
             const data = userDocSnap.data();
             nickname = data.nickname || "";
@@ -46,6 +49,7 @@ const AuthListener = () => {
       }
     });
 
+    // 컴포넌트가 언마운트되면 리스너 제거
     return () => unsubscribe();
   }, [setLogin, logout]);
 

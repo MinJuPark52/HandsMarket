@@ -71,9 +71,13 @@ const RoutesWrapper = ({
 }) => {
   const location = useLocation();
 
+  // Nav 숨김
+  const hideNavRoutes = ["/search", "/searchresult", "/editor"];
+  const shouldShowNav = !hideNavRoutes.includes(location.pathname);
+
   return (
     <>
-      {location.pathname !== "/search" && (
+      {shouldShowNav && (
         <Nav isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       )}
       <Routes>

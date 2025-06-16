@@ -177,6 +177,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       if (mainImage) {
         const mainImageRef = ref(storage, `products/${id}/main`);
         await uploadBytes(mainImageRef, mainImage);
+
+        // [Troubleshooting: CORS Error]
+        // Firebase Storage 버킷 경로가 잘못되어 있어서 에러 발생.
         mainImageUrl = await getDownloadURL(mainImageRef);
         setMainImagePreview(mainImageUrl);
       }

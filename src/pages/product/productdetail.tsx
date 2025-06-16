@@ -89,13 +89,6 @@ const ProductDetailPage = () => {
   const { uid } = useLoginStore();
   const isLoggedIn = Boolean(uid);
 
-  const [selectedOptions, setSelectedOptions] = useState<{
-    [key: string]: ProductOptionValue;
-  }>({});
-  const [selectedCombinations, setSelectedCombinations] = useState<
-    SelectedCombo[]
-  >([]);
-
   const {
     data: product,
     isLoading,
@@ -106,6 +99,16 @@ const ProductDetailPage = () => {
     enabled: !!id,
   });
 
+  // 옵션 선택 상태 저장
+  const [selectedOptions, setSelectedOptions] = useState<{
+    [key: string]: ProductOptionValue;
+  }>({});
+  // 선택 완료된 옵션 조합 리스트 (옵션 + 수량)
+  const [selectedCombinations, setSelectedCombinations] = useState<
+    SelectedCombo[]
+  >([]);
+
+  // 옵션 선택 시 호출: 옵션 저장 후, 모든 옵션이 선택되면 조합 추가
   const handleOptionChange = (optionName: string, valueLabel: string) => {
     const option = product?.options?.find((o) => o.name === optionName);
     const value = option?.values.find((v) => v.label === valueLabel);
@@ -123,7 +126,7 @@ const ProductDetailPage = () => {
         quantity: 1,
       };
       setSelectedCombinations((prev) => [...prev, newCombo]);
-      setSelectedOptions({});
+      setSelectedOptions({}); // 선택 초기화
     }
   };
 

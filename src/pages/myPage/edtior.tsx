@@ -96,7 +96,7 @@ const EditProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="mt-[4rem] flex justify-center">
+    <div className="mt-[2rem] flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-[1024px] text-center my-[10px] py-4"

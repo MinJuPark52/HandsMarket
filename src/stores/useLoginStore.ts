@@ -27,8 +27,10 @@ const useLoginStore = create<LoginState>()(
       profileImage: "",
       userType: "",
       isLoggedIn: false,
+      // 로그인 성공 시 사용자 정보와 로그인 상태를 저장
       setLogin: (uid, email, nickname, profileImage, userType = "") =>
         set({ uid, email, nickname, profileImage, userType, isLoggedIn: true }),
+      // 로그아웃 시 상태 초기화
       logout: () =>
         set({
           uid: "",
@@ -40,8 +42,9 @@ const useLoginStore = create<LoginState>()(
         }),
     }),
     {
-      name: "login-storage",
+      name: "login-storage", // 로컬스토리지에 저장할 이름
       partialize: (state) => ({
+        // 저장할 상태의 일부만 선택
         uid: state.uid,
         email: state.email,
         nickname: state.nickname,

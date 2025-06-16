@@ -101,22 +101,7 @@ const SearchResults = () => {
     );
 
   return (
-    <div className="w-[1024px] mx-auto mt-4">
-      {/* 페이지 타이틀 */}
-      <h1 className="text-2xl font-bold mb-2">상품 검색 결과</h1>
-
-      {/* 검색어 및 결과 개수 안내 */}
-      {searchTerm ? (
-        <p className="mb-4 text-gray-700">
-          <strong>"{searchTerm}"</strong> 에 대한 검색 결과{" "}
-          {filteredProducts.length}건
-        </p>
-      ) : (
-        <p className="mb-4 text-gray-500">
-          검색어를 입력하고 상품을 찾아보세요.
-        </p>
-      )}
-
+    <div className="w-[1024px] mx-auto mt-6">
       {/* 검색창 */}
       <div className="flex mb-4">
         <input
@@ -135,9 +120,9 @@ const SearchResults = () => {
         </button>
       </div>
 
-      <div className="flex items-center justify-between mr-4">
+      <div className="flex items-center justify-between mr-4 py-2">
         {products && (
-          <p className="text-gray-700 font-medium p-2">
+          <p className="text-gray-700 font-medium">
             "{searchTerm}" 검색 결과 {filteredProducts.length}건
           </p>
         )}

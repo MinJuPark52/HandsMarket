@@ -51,21 +51,24 @@ const Pay: React.FC = () => {
     const directBuyRaw = localStorage.getItem("directBuy");
     if (directBuyRaw) {
       const directBuy = JSON.parse(directBuyRaw);
-      const baseProduct = Array.isArray(directBuy.product)
-        ? directBuy.product[0]
-        : directBuy.product;
-
       const combinations = directBuy.combinations;
 
-      const optionNameMap: Record<string, string> = {};
-      if (Array.isArray(baseProduct.options)) {
-        baseProduct.options.forEach((opt: any) => {
-          optionNameMap[opt.name] = opt.label;
-        });
-      }
-
       if (Array.isArray(combinations) && combinations.length > 0) {
-        const newProducts = combinations.map((combo: any) => {
+        const newProducts = combinations.map((combo: any, index: number) => {
+          // 상품 정보를 combinations 순서에 맞게 가져오기
+          const product = Array.isArray(directBuy.product)
+            ? directBuy.product[index]
+            : directBuy.product;
+
+          // 옵션 이름 매핑 (ex: size -> 사이즈)
+          const optionNameMap: Record<string, string> = {};
+          if (Array.isArray(product.options)) {
+            product.options.forEach((opt: any) => {
+              optionNameMap[opt.name] = opt.label;
+            });
+          }
+
+          // 옵션 텍스트 생성
           const optionsText = Object.entries(combo.options || {})
             .map(([key, value]) => {
               const val = value as { label: string };
@@ -74,25 +77,31 @@ const Pay: React.FC = () => {
             })
             .join(" / ");
 
+          // 옵션 가격 합산
           const optionPrice = Object.values(combo.options || {}).reduce(
             (sum: number, opt: any) => sum + (opt?.price || 0),
             0
           );
 
-          const price =
-            (baseProduct.price + optionPrice) * (combo.quantity || 1);
+          // 총 가격 계산 (상품 가격 + 옵션 가격) * 수량
+          const price = (product.price + optionPrice) * (combo.quantity || 1);
 
           return {
-            name: baseProduct.title,
+            name: product.title,
             options: optionsText,
             quantity: combo.quantity || 1,
             price,
-            image: baseProduct.image,
+            image: product.image,
           };
         });
 
         setProducts(newProducts);
       } else {
+        // combinations 없을 때 기본 처리
+        const baseProduct = Array.isArray(directBuy.product)
+          ? directBuy.product[0]
+          : directBuy.product;
+
         setProducts([
           {
             name: baseProduct.title,
@@ -180,7 +189,7 @@ const Pay: React.FC = () => {
                   </div>
                   <div className="flex items-end mt-14">
                     <p className="text-xl font-semibold whitespace-nowrap">
-                      {(product.price * product.quantity).toLocaleString()}원
+                      {product.price.toLocaleString()}원
                     </p>
                   </div>
                 </div>

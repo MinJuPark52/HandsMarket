@@ -59,16 +59,15 @@ const Payment: React.FC<PaymentPageProps> = ({
       return;
     }
 
+    // 아임포트 모듈과 가맹점 코드 가져오기
     const { IMP } = window;
     const merchantCode = process.env.REACT_APP_PORTONE_MERCHANT_ID;
 
-    if (!IMP || !merchantCode) {
-      console.log("결제 모듈이 로드되지 않았거나 가맹점 코드가 없습니다.");
-      return;
-    }
+    if (!IMP || !merchantCode) return;
 
-    IMP.init(merchantCode);
+    IMP.init(merchantCode); // 아임포트 초기화
 
+    // 결제 요청 정보 구성
     const paymentData = {
       pg: "html5_inicis",
       pay_method: "card",
@@ -82,6 +81,7 @@ const Payment: React.FC<PaymentPageProps> = ({
       buyer_postcode: buyer.postcode,
     };
 
+    // 결제 요청
     IMP.request_pay(paymentData, async (rsp: any) => {
       if (rsp.success) {
         try {
