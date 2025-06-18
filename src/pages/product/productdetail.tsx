@@ -257,8 +257,11 @@ const ProductDetailPage = () => {
             <div className="dark:bg-gray-600 mt-4 border bg-[#fefefe] rounded-lg px-4 py-2">
               {product.options?.map((option) => (
                 <div key={option.name} className="mt-2 mb-1">
-                  <p className="text-lg">{option.label}</p>
+                  <label htmlFor={`select-${option.name}`} className="text-lg">
+                    {option.label}
+                  </label>
                   <select
+                    id={`select-${option.name}`}
                     className="dark:bg-gray-300 border bg-[#f3f3f3] text-lg rounded-lg px-2 w-full h-[3rem] text-gray-700 mb-2"
                     value={selectedOptions[option.name]?.label || ""}
                     onChange={(e) =>
