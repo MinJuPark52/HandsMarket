@@ -1,4 +1,5 @@
 import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import ProductDetailPage from "./productDetail";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -6,10 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import useLoginStore from "../../stores/useLoginStore";
 
 jest.mock("@tanstack/react-query");
-jest.mock("../../stores/useLoginStore");
+jest.mock("../../stores/useLoginStore", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 const mockedUseQuery = useQuery as jest.Mock;
-const mockedUseLoginStore = useLoginStore as unknown as jest.Mock;
+const mockedUseLoginStore = useLoginStore as unknown as jest.Mock<any, any>;
 
 const sampleProduct = {
   id: "1",
@@ -37,6 +41,7 @@ const sampleProduct = {
 describe("ProductDetailPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.alert = jest.fn();
   });
 
   const renderComponent = (id = "1") =>
@@ -57,12 +62,16 @@ describe("ProductDetailPage", () => {
       isLoading: true,
       error: null,
     });
+    mockedUseLoginStore.mockReturnValue({ uid: null });
+
     renderComponent();
-    expect(screen.getByText(/loading/i)).not.toBeNull(); // 실제로는 BeatLoader 존재하는지 확인 가능
+    expect(screen.getByText(/loading/i)).not.toBeNull();
   });
 
   test("에러 또는 제품이 없으면 메시지 출력", () => {
     mockedUseQuery.mockReturnValue({ data: null, isLoading: false, error: {} });
+    mockedUseLoginStore.mockReturnValue({ uid: null });
+
     renderComponent();
     expect(screen.getByText(/not found or error/i)).toBeInTheDocument();
   });
@@ -99,13 +108,13 @@ describe("ProductDetailPage", () => {
       expect(screen.getByText(/색상: 빨강/)).toBeInTheDocument();
     });
 
-    const plusBtn = screen.getByText("+");
+    const plusBtn = screen.getByRole("button", { name: /수량 증가/i });
     fireEvent.click(plusBtn);
 
-    const minusBtn = screen.getByText("-");
+    const minusBtn = screen.getByRole("button", { name: /수량 감소/i });
     fireEvent.click(minusBtn);
 
-    const removeBtn = screen.getByRole("button", { name: /×/i });
+    const removeBtn = screen.getByRole("button", { name: /삭제/i });
     fireEvent.click(removeBtn);
 
     await waitFor(() => {

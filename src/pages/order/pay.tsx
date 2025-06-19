@@ -6,7 +6,6 @@ import { GoChevronDown, GoChevronUp } from "react-icons/go";
 import OrdererInfo from "./orderInfo";
 import Payment from "../order/payment";
 
-// Zod 유효성 검사
 const schema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
   phone: z.string().min(10, "전화번호를 입력해주세요"),
@@ -26,7 +25,6 @@ type ProductForPay = {
   image?: string;
 };
 
-// 결제 수단 타입
 const paymentMethods = ["card", "bank", "phone"] as const;
 type PaymentMethod = (typeof paymentMethods)[number];
 
@@ -55,12 +53,10 @@ const Pay: React.FC = () => {
 
       if (Array.isArray(combinations) && combinations.length > 0) {
         const newProducts = combinations.map((combo: any, index: number) => {
-          // 상품 정보를 combinations 순서에 맞게 가져오기
           const product = Array.isArray(directBuy.product)
             ? directBuy.product[index]
             : directBuy.product;
 
-          // 옵션 이름 매핑 (ex: size -> 사이즈)
           const optionNameMap: Record<string, string> = {};
           if (Array.isArray(product.options)) {
             product.options.forEach((opt: any) => {
@@ -68,7 +64,6 @@ const Pay: React.FC = () => {
             });
           }
 
-          // 옵션 텍스트 생성
           const optionsText = Object.entries(combo.options || {})
             .map(([key, value]) => {
               const val = value as { label: string };
@@ -77,13 +72,11 @@ const Pay: React.FC = () => {
             })
             .join(" / ");
 
-          // 옵션 가격 합산
           const optionPrice = Object.values(combo.options || {}).reduce(
             (sum: number, opt: any) => sum + (opt?.price || 0),
             0
           );
 
-          // 총 가격 계산 (상품 가격 + 옵션 가격) * 수량
           const price = (product.price + optionPrice) * (combo.quantity || 1);
 
           return {
@@ -97,7 +90,6 @@ const Pay: React.FC = () => {
 
         setProducts(newProducts);
       } else {
-        // combinations 없을 때 기본 처리
         const baseProduct = Array.isArray(directBuy.product)
           ? directBuy.product[0]
           : directBuy.product;

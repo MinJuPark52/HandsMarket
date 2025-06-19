@@ -126,7 +126,7 @@ const ProductDetailPage = () => {
         quantity: 1,
       };
       setSelectedCombinations((prev) => [...prev, newCombo]);
-      setSelectedOptions({}); // 선택 초기화
+      setSelectedOptions({});
     }
   };
 
@@ -194,6 +194,7 @@ const ProductDetailPage = () => {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-20">
+        <span>Loading...</span>
         <BeatLoader color="#9CA3AF" size={13} margin={3} />
       </div>
     );
@@ -304,6 +305,7 @@ const ProductDetailPage = () => {
                     <div className="flex justify-between items-center">
                       <p>{combinationText}</p>
                       <button
+                        aria-label="삭제"
                         onClick={() => removeCombination(index)}
                         className="text-red-500 text-xl hover:underline"
                       >
@@ -314,6 +316,7 @@ const ProductDetailPage = () => {
                     <div className="flex items-center justify-between mt-2 gap-4">
                       <div className="flex items-center gap-2">
                         <button
+                          aria-label="수량 감소"
                           onClick={() => updateQuantity(index, -1)}
                           className="px-3 py-1 border rounded"
                         >
@@ -321,6 +324,7 @@ const ProductDetailPage = () => {
                         </button>
                         <span className="text-lg">{combo.quantity}</span>
                         <button
+                          aria-label="수량 증가"
                           onClick={() => updateQuantity(index, 1)}
                           className="px-3 py-1 border rounded"
                         >
