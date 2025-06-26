@@ -65,7 +65,7 @@ describe("ProductDetailPage", () => {
     mockedUseLoginStore.mockReturnValue({ uid: null });
 
     renderComponent();
-    expect(screen.getByText(/loading/i)).not.toBeNull();
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
   test("에러 또는 제품이 없으면 메시지 출력", () => {

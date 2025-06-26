@@ -1,4 +1,6 @@
-module.exports = {
+import "@testing-library/jest-dom";
+
+const config = {
   preset: "ts-jest/presets/default-esm",
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
@@ -12,3 +14,5 @@ module.exports = {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
 };
+
+export default config;
