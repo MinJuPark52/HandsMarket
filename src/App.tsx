@@ -15,10 +15,10 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-800 text-black dark:text-white">
-      <div className="mt-20">
+      <div className="mt-16">
         <HomeCategory categories={categories} onSelect={handleSelect} />
       </div>
-      <div className="mt-4">
+      <div className="mt-2">
         <Slide />
       </div>
       <div className="mt-2">

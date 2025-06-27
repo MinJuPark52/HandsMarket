@@ -27,7 +27,7 @@ const CategoryList: React.FC<Props> = ({ categories, onSelect }) => {
   };
 
   return (
-    <div className="w-[1024px] mx-auto bg-white rounded-2xl flex justify-between">
+    <div className="max-w-[1024px] mx-auto flex justify-between">
       {categories.map((category) => {
         const isSelected = category.id === selectedId;
         return (
@@ -36,11 +36,11 @@ const CategoryList: React.FC<Props> = ({ categories, onSelect }) => {
             onClick={() => handleClick(category)}
             className={`
               flex flex-col items-center justify-center w-1/4
-              py-4 font-semibold text-center
+              p-3 font-semibold text-center
               transition-colors 
               ${
                 isSelected
-                  ? "text-gray-700 border-b border-gray-600"
+                  ? "text-gray-700 border-b border-gray-600 dark:text-white dark:border-white-600"
                   : "text-gray-500 hover:bg-gray-100 hover:text-gray-600"
               }
               cursor-pointer

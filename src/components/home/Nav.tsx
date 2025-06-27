@@ -22,7 +22,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
 
   return (
     <>
-      <div className="max-w-[1024px] mx-auto flex justify-between items-center py-4 fixed top-0 left-0 right-0 z-[1000] bg-[#ffffff] dark:bg-gray-800 text-black dark:text-white">
+      <div className="max-w-[1024px] mx-auto flex justify-between items-center p-4 fixed top-0 left-0 right-0 z-[1000] bg-[#ffffff] dark:bg-gray-800 text-black dark:text-white">
         <div className="flex items-center relative">
           <p className="text-orange-500 font-bold text-2xl dark:text-white italic">
             <Link to="/">HandsMarket</Link>
@@ -33,7 +33,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             aria-label="다크 모드 토글"
-            className="text-[1.56rem] leading-8 cursor-pointer m-[10px]"
+            className="text-[1.3rem] leading-8 cursor-pointer m-[10px]"
           >
             {isDarkMode ? <FiSun /> : <FiMoon />}
           </button>
@@ -41,7 +41,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
           <button
             onClick={() => setIsSearchOpen(true)}
             aria-label="검색"
-            className="text-[1.5rem] leading-8 cursor-pointer m-[10px]"
+            className="text-[1.3rem] leading-8 cursor-pointer m-[10px]"
           >
             <FiSearch />
           </button>
@@ -49,7 +49,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
           <button
             onClick={() => navigate("/cart")}
             aria-label="장바구니"
-            className="text-[1.56rem] leading-8 cursor-pointer m-[10px]"
+            className="text-[1.3rem] leading-8 cursor-pointer m-[10px]"
           >
             <FiShoppingCart />
           </button>
@@ -57,7 +57,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
           <button
             onClick={() => navigate(isLoggedIn ? "/profile" : "/login")}
             aria-label={isLoggedIn ? "마이페이지" : "로그인"}
-            className="text-[1.56rem] leading-8 cursor-pointer m-[10px]"
+            className="text-[1.3rem] leading-8 cursor-pointer m-[10px]"
           >
             <FiUser />
           </button>
