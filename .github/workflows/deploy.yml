@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  frontend-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
+
+      - name: Deploy to your server
+        env:
+          SERVER_HOST: ${}
+          SERVER_USER: ${}
+          SERVER_KEY: ${}
+        run: |
+          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "cd /path/to/your/project && git pull && npm install && pm2 restart your-app"

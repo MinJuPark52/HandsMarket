@@ -25,3 +25,5 @@ yarn-error.log*
 # PnP
 .pnp
 .pnp.js
+node_modules/
+frontend/node_modules/
