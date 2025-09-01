@@ -79,7 +79,7 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
-// 로그인 api
+// 로그인
 router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
   const [rows] = await req.pool.query(
