@@ -13,7 +13,7 @@ var app = express();
 
 var port = process.env.PORT || 3000;
 
-// MySQL 연결 풀 생성
+// MySQL
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
@@ -24,7 +24,6 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-// 미들웨어로 pool을 req에 붙여서 라우터에서 접근 가능하게 할 수도 있어요.
 app.use((req, res, next) => {
   req.pool = pool;
   next();
@@ -34,7 +33,6 @@ app.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
 
-// view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
@@ -47,20 +45,18 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
-// catch 404 and forward to error handler
+// 404
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+// error
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({
+    message: err.message,
+    ...(req.app.get("env") === "development" && { stack: err.stack }),
+  });
 });
 
 module.exports = app;
