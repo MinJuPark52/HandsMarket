@@ -8,9 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
+      # 프론트엔드
       - name: Install dependencies (frontend)
         run: |
           cd frontend
@@ -21,16 +23,6 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Install dependencies (backend)
-        run: |
-          cd backend
-          npm install
-
-      - name: Build backend (필요시)
-        run: |
-          cd backend
-          npm run build
-
       - name: Deploy frontend
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -38,10 +30,17 @@ jobs:
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
           ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "
-            rm -rf /path/to/frontend/*
-            exit"
-          scp -i $SERVER_KEY -r frontend/build/* $SERVER_USER@$SERVER_HOST:/path/to/frontend/
-          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "pm2 restart frontend-app"
+          cd /path/to/frontend &&
+          git pull &&
+          npm install &&
+          pm2 restart frontend-app || pm2 start frontend-app --name frontend-app -- node server.js
+          "
+
+      # 백엔드
+      - name: Install dependencies (backend)
+        run: |
+          cd backend
+          npm install
 
       - name: Deploy backend
         env:
@@ -49,4 +48,9 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
-          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "cd /path/to/backend && git pull && npm install && pm2 restart backend-app"
+          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "
+          cd /path/to/backend &&
+          git pull &&
+          npm install &&
+          pm2 restart backend-app || pm2 start backend-app --name backend-app -- node ./bin/www
+          "
