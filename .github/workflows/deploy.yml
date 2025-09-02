@@ -6,28 +6,47 @@ on:
       - main
 
 jobs:
-  frontend-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "14"
+      - name: Install dependencies (frontend)
+        run: |
+          cd frontend
+          npm install
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
 
-      - name: Build the project
-        run: npm run build
+      - name: Install dependencies (backend)
+        run: |
+          cd backend
+          npm install
 
-      - name: Deploy to your server
+      - name: Build backend (필요시)
+        run: |
+          cd backend
+          npm run build
+
+      - name: Deploy frontend
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
-          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "cd /path/to/your/project && git pull && npm install && pm2 restart your-app"
+          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "
+            rm -rf /path/to/frontend/*
+            exit"
+          scp -i $SERVER_KEY -r frontend/build/* $SERVER_USER@$SERVER_HOST:/path/to/frontend/
+          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "pm2 restart frontend-app"
+
+      - name: Deploy backend
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_KEY: ${{ secrets.SERVER_KEY }}
+        run: |
+          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "cd /path/to/backend && git pull && npm install && pm2 restart backend-app"
