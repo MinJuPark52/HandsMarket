@@ -29,12 +29,17 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
-          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "
-          cd /path/to/frontend &&
-          git pull &&
-          npm install &&
-          pm2 restart frontend-app || pm2 start frontend-app --name frontend-app -- node server.js
+          echo "$SERVER_KEY" > private_key
+          chmod 600 private_key
+
+          ssh -i private_key $SERVER_USER@$SERVER_HOST "
+            cd /path/to/frontend &&
+            git pull &&
+            npm install &&
+            pm2 restart frontend-app || pm2 start frontend-app --name frontend-app -- node server.js
           "
+
+          rm private_key
 
       # 백엔드
       - name: Install dependencies (backend)
@@ -48,9 +53,14 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
-          ssh -i $SERVER_KEY $SERVER_USER@$SERVER_HOST "
-          cd /path/to/backend &&
-          git pull &&
-          npm install &&
-          pm2 restart backend-app || pm2 start backend-app --name backend-app -- node ./bin/www
+          echo "$SERVER_KEY" > private_key
+          chmod 600 private_key
+
+          ssh -i private_key $SERVER_USER@$SERVER_HOST "
+            cd /path/to/backend &&
+            git pull &&
+            npm install &&
+            pm2 restart backend-app || pm2 start backend-app --name backend-app -- node ./bin/www
           "
+
+          rm private_key
