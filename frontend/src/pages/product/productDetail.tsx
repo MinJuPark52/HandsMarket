@@ -203,7 +203,7 @@ const ProductDetailPage = () => {
   return (
     <>
       <div className="dark:text-white flex justify-center px-4 mt-20">
-        <div className="w-[1024px] flex gap-4">
+        <div className="w-[768px] flex gap-4">
           <div className="w-[500px] h-[550px]">
             <img
               src={product.image}

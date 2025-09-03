@@ -72,18 +72,18 @@ const LoginPage: React.FC = () => {
   return (
     <div className="mt-[5rem]">
       <form
-        className="mx-auto w-[900px] text-center"
+        className="mx-auto w-[768px] text-center"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="-w-[600px] mx-auto text-left mb-4">
-          <h1 className="flex justify-center text-3xl font-semibold dark:text-white">
+          <h1 className="flex justify-center text-2xl font-semibold dark:text-white">
             SignIn
           </h1>
         </div>
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md dark:text-gray-700"
+            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md dark:text-gray-700"
             placeholder="이메일"
             {...register("id")}
           />
@@ -94,7 +94,7 @@ const LoginPage: React.FC = () => {
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md dark:text-gray-700"
+            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md dark:text-gray-700"
             placeholder="비밀번호"
             type="password"
             {...register("password")}

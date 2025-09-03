@@ -251,10 +251,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-[1024px] mx-auto mt-20 space-y-5"
-    >
+    <form onSubmit={handleSubmit} className="w-[768px] mx-auto mt-20 space-y-5">
       <h1 className="text-3xl font-bold text-gray-800">
         {productId ? "상품 수정" : "상품 등록"}
       </h1>

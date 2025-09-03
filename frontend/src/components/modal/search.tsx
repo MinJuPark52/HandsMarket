@@ -65,7 +65,7 @@ const SearchPageModal: React.FC<SearchPageModalProps> = ({ onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 w-[1024px] rounded-lg relative"
+        className="bg-white dark:bg-gray-800 w-[768px] rounded-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 검색 입력창 */}

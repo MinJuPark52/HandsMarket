@@ -112,7 +112,7 @@ const CartPage = () => {
 
   return (
     <div className="mt-20 w-full flex justify-center dark:text-white">
-      <div className="w-full max-w-[1024px]">
+      <div className="w-full max-w-[768px]">
         <h1 className="text-2xl font-bold mb-4">장바구니</h1>
 
         {cartItems.length === 0 ? (

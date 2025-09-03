@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <>
       <div className="mt-2 w-full flex justify-center">
-        <div className="max-w-[1024px] flex flex-col pl-4 bg-[#f5f5f5]  dark:bg-gray-700 text-gray-600 dark:text-white w-full">
+        <div className="max-w-[768px] flex flex-col pl-4 bg-[#f5f5f5]  dark:bg-gray-700 text-gray-600 dark:text-white w-full">
           <div>
             <h2 className="mt-2 text-xl font-bold text-black dark:text-white mb-2">
               HandsMarket

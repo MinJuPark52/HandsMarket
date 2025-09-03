@@ -101,7 +101,7 @@ const SearchResults = () => {
     );
 
   return (
-    <div className="w-[1024px] mx-auto mt-6">
+    <div className="w-[768px] mx-auto mt-6">
       {/* 검색창 */}
       <div className="flex mb-4">
         <input

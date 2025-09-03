@@ -27,7 +27,7 @@ const CategoryList: React.FC<Props> = ({ categories, onSelect }) => {
   };
 
   return (
-    <div className="max-w-[1024px] mx-auto flex justify-between">
+    <div className="max-w-[768px] mx-auto flex justify-between">
       {categories.map((category) => {
         const isSelected = category.id === selectedId;
         return (

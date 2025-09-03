@@ -80,7 +80,7 @@ const ProductList = () => {
   }
 
   return (
-    <div className="w-[1024px] mx-auto mt-20 px-4">
+    <div className="w-[768px] mx-auto mt-20 px-4">
       <h1 className="text-2xl font-bold mb-4">등록한 상품</h1>
       {products.length === 0 ? (
         <p className="text-gray-500">등록된 상품이 없습니다.</p>

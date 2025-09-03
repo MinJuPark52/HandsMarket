@@ -83,10 +83,10 @@ const SignupPage: React.FC = () => {
     <div className="mt-[4rem]">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mx-auto w-[1024px] text-center my-[10px] py-4"
+        className="mx-auto w-[768px] text-center my-[10px] py-4"
       >
         <div className="-w-[600px] mx-auto text-left mb-4">
-          <h1 className="flex justify-center text-3xl font-semibold dark:text-white">
+          <h1 className="flex justify-center text-2xl font-semibold dark:text-white">
             SignUp
           </h1>
         </div>
@@ -118,14 +118,14 @@ const SignupPage: React.FC = () => {
 
         <div className="flex items-center justify-center mb-2">
           <input
-            className="w-[420px] h-[50px] p-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
+            className="w-[420px] p-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="이메일"
             type="text"
             {...register("id")}
           />
           <span className="p-2 mx-2 dark:text-white">@</span>
           <select
-            className="p-2 h-[50px] border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
+            className="p-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             {...register("emailDomain")}
           >
             <option value="@gmail.com">gmail.com</option>
@@ -145,7 +145,7 @@ const SignupPage: React.FC = () => {
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
+            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="비밀번호"
             type="password"
             {...register("password")}
@@ -157,7 +157,7 @@ const SignupPage: React.FC = () => {
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
+            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="비밀번호 재입력"
             type="password"
             {...register("passwordAgain")}
@@ -171,7 +171,7 @@ const SignupPage: React.FC = () => {
 
         <div>
           <input
-            className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
+            className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="닉네임"
             type="text"
             {...register("nickname")}
@@ -183,7 +183,7 @@ const SignupPage: React.FC = () => {
 
         <button
           disabled={isSubmitting}
-          className="mt-2 w-[600px] h-[50px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600 disabled:opacity-50"
+          className="mt-2 w-[600px] p-3 bg-orange-500 text-white text-base rounded-md cursor-pointer hover:bg-orange-600 disabled:opacity-50"
           type="submit"
         >
           회원가입

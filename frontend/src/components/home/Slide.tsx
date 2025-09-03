@@ -3,7 +3,7 @@ const Slide = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="relative w-[1024px] h-[150px] overflow-hidden">
+      <div className="relative w-[768px] h-[150px] overflow-hidden">
         {slides.map((slide, index) => (
           <div
             key={index}

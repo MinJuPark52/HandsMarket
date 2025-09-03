@@ -31,7 +31,7 @@ const Category: React.FC<CategoryProps> = ({ product }) => {
   const [activeTab, setActiveTab] = useState("details");
 
   return (
-    <div className="mx-auto w-[1024px] mt-5 border-t border-gray-300">
+    <div className="mx-auto w-[768px] mt-5 border-t border-gray-300">
       {/* 탭 메뉴 */}
       <div className="flex mb-4">
         {tabs.map((tab) => (

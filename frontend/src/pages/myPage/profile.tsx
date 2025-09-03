@@ -40,7 +40,7 @@ const Profile = () => {
   if (!isLoggedIn) return null;
 
   return (
-    <div className="min-h-screen max-w-[1024px] mx-auto mt-20">
+    <div className="min-h-screen max-w-[768px] mx-auto mt-20">
       <div className="bg-gray-100 h-[100px] p-6 flex items-center gap-4">
         <img
           src={profileImage || "/default-profile.png"}

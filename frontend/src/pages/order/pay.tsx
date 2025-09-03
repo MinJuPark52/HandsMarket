@@ -135,10 +135,7 @@ const Pay: React.FC = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-[1024px] mx-auto mt-20"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="w-[768px] mx-auto mt-20">
       <div className="flex gap-6">
         {/* 왼쪽 영역 - 2/3 */}
         <div className="w-2/3 space-y-10">

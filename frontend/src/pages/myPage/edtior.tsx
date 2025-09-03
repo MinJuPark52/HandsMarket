@@ -99,7 +99,7 @@ const EditProfilePage: React.FC = () => {
     <div className="mt-[2rem] flex justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-[1024px] text-center my-[10px] py-4"
+        className="w-[768px] text-center my-[10px] py-4"
       >
         <div className="w-full max-w-[600px] mx-auto mb-4">
           <h1 className="text-2xl font-semibold dark:text-white text-center">

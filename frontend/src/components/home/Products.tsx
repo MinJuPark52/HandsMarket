@@ -52,7 +52,7 @@ const Products = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="mt-2 mx-auto w-full min-w-[600px] max-w-[1024px]">
+      <div className="mt-2 mx-auto w-full min-w-[600px] max-w-[768px]">
         <h1 className="text-xl mb-4 mt-2 font-medium">방금 등록된 아이템</h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {productList.map((product: Product) => (
