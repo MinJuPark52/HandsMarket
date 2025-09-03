@@ -4,13 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useLoginStore from "../../stores/useLoginStore";
-import {
-  signInWithEmailAndPassword,
-  setPersistence,
-  browserLocalPersistence,
-} from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { db, auth } from "../../firebase/firebaseConfig";
+import axios from "axios";
 
 const loginSchema = z.object({
   id: z
@@ -43,51 +37,42 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await setPersistence(auth, browserLocalPersistence);
+      const response = await axios.post("http://localhost:3000/users/login", {
+        email: data.id,
+        password: data.password,
+      });
 
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        data.id,
-        data.password
-      );
-      const user = userCredential.user;
-
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
-      }
-
-      const userData = userDoc.data();
+      const { token, user } = response.data;
 
       setLogin(
-        user.uid,
-        user.email || "",
-        userData.nickname || "",
-        userData.profileImage || "",
-        userData.userType || "user"
+        user.id,
+        user.email,
+        user.nickname,
+        user.profileImage,
+        user.userType
       );
-      alert(`로그인되었습니다.`);
+
+      localStorage.setItem("token", token);
+
       setError("");
+      alert("로그인되었습니다.");
+
       const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
       localStorage.removeItem("redirectAfterLogin");
       navigate(redirectPath);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError("로그인에 실패했습니다. 다시 시도해 주세요.");
-        console.error("로그인 실패:", error.message);
-      } else {
-        setError("알 수 없는 오류가 발생했습니다.");
-        console.error("알 수 없는 오류:", error);
-      }
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message ||
+          "로그인에 실패했습니다. 다시 시도해 주세요."
+      );
+      console.error("로그인 실패:", error);
     }
   };
 
   return (
     <div className="mt-[5rem]">
       <form
-        className="mx-auto w-[1024px] text-center"
+        className="mx-auto w-[900px] text-center"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="-w-[600px] mx-auto text-left mb-4">

@@ -38,9 +38,9 @@ async function signup(req, res, next) {
     }
 
     const saltRounds = 12;
-    const password_hash = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const userId = await createUser(req.pool, email, password_hash, name);
+    const userId = await createUser(req.pool, email, hashedPassword, name);
 
     res.status(201).json({ message: "Signup successful", userId });
   } catch (error) {
@@ -81,10 +81,10 @@ async function updateUser(req, res, next) {
       }
     }
 
-    let password_hash = null;
+    let hashedPassword = null;
     if (password) {
       const saltRounds = 12;
-      password_hash = await bcrypt.hash(password, saltRounds);
+      hashedPassword = await bcrypt.hash(password, saltRounds);
     }
 
     const fields = [];
@@ -98,9 +98,9 @@ async function updateUser(req, res, next) {
       fields.push("email = ?");
       values.push(email);
     }
-    if (password_hash) {
+    if (hashedPassword) {
       fields.push("password_hash = ?");
-      values.push(password_hash);
+      values.push(hashedPassword);
     }
 
     if (fields.length === 0) {
