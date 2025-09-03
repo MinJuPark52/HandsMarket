@@ -16,10 +16,10 @@ async function findUserById(pool, userId) {
 }
 
 // 회원가입
-async function createUser(pool, email, password_hash, name) {
+async function createUser(pool, email, password_hash, name, role) {
   const [result] = await pool.query(
-    "INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)",
-    [email, password_hash, name]
+    "INSERT INTO users (email, password_hash, name, role) VALUES (?, ?, ?, ?)",
+    [email, password_hash, name, role]
   );
   return result.insertId;
 }

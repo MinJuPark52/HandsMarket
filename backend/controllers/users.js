@@ -29,7 +29,7 @@ async function login(req, res, next) {
 }
 
 async function signup(req, res, next) {
-  const { email, password, name } = req.body;
+  const { email, password, name, role } = req.body;
 
   try {
     const existingUser = await findUserByEmail(req.pool, email);
@@ -40,7 +40,13 @@ async function signup(req, res, next) {
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const userId = await createUser(req.pool, email, hashedPassword, name);
+    const userId = await createUser(
+      req.pool,
+      email,
+      hashedPassword,
+      name,
+      role
+    );
 
     res.status(201).json({ message: "Signup successful", userId });
   } catch (error) {

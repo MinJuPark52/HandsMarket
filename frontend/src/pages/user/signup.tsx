@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../../firebase/firebaseConfig";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import axios from "axios";
 
 const signupSchema = z
   .object({
@@ -36,7 +34,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<"user" | "seller">("user");
+  const [userType, setUserType] = useState<"buyer" | "seller">("buyer");
 
   const {
     register,
@@ -51,30 +49,20 @@ const SignupPage: React.FC = () => {
 
   const onSubmit = async (data: SignupFormData) => {
     const fullEmail = `${data.id}${data.emailDomain}`;
+    const role = userType === "buyer" ? "user" : "seller";
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        fullEmail,
-        data.password
-      );
-
-      await updateProfile(userCredential.user, {
-        displayName: data.nickname,
+      await axios.post("http://localhost:3000/users/signup", {
+        email: fullEmail,
+        password: data.password,
+        name: data.nickname,
+        role: userType,
       });
 
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        nickname: data.nickname,
-        userType,
-        profileImage:
-          "https://i.postimg.cc/Lm0s77wn/kanhaiya-sharma-z59f-D2-V4-HA-unsplash.jpg",
-        createdAt: serverTimestamp(),
-      });
-
-      alert("회원가입을 완료했습니다.");
-      navigate("/");
+      alert("회원가입이 완료되었습니다.");
+      navigate("/login");
     } catch (error: any) {
-      alert(`회원가입 오류: ${error.message}`);
+      alert(`회원가입 실패: ${error.response?.data?.message || error.message}`);
       console.error(error);
     }
   };
@@ -94,9 +82,9 @@ const SignupPage: React.FC = () => {
         <div className="w-[600px] mx-auto flex justify-center mb-6">
           <button
             type="button"
-            onClick={() => setUserType("user")}
+            onClick={() => setUserType("buyer")}
             className={`w-1/2 py-3 text-lg font-medium ${
-              userType === "user"
+              userType === "buyer"
                 ? "text-orange-500 border-b-2 border-orange-500"
                 : "text-gray-400 border-b border-gray-400"
             }`}
