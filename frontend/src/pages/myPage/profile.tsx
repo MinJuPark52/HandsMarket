@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "../../firebase/firebaseConfig";
 import { useNavigate, Link } from "react-router-dom";
 import useLoginStore from "../../stores/useLoginStore";
 import { BeatLoader } from "react-spinners";
@@ -21,7 +20,6 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
       logout();
       alert("로그아웃되었습니다.");
       navigate("/");
@@ -70,7 +68,7 @@ const Profile = () => {
       </div>
 
       {/* 사용자 */}
-      {userType === "user" && (
+      {userType === "buyer" && (
         <>
           <Link
             to="/reviews"
@@ -87,6 +85,16 @@ const Profile = () => {
       {/* 판매자 */}
       {userType === "seller" && (
         <>
+          <Link
+            to="/register_seller"
+            className="bg-white p-4 flex items-center justify-between border-b"
+          >
+            <span className="font-semibold text-gray-700">판매자 등록</span>
+            <span className="text-gray-600">
+              <GoChevronRight size={20} />
+            </span>
+          </Link>
+
           <Link
             to="/productform"
             className="bg-white p-4 flex items-center justify-between border-b"

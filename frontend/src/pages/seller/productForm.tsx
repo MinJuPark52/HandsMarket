@@ -24,13 +24,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState<number>(0);
-  const [authorName, setAuthorName] = useState("");
   const [tags, setTags] = useState<string>("");
-
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [detailImage, setDetailImage] = useState<File | null>(null);
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [detailImagePreview, setDetailImagePreview] = useState<string | null>(
     null
@@ -69,7 +65,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
           const authorSnap = await getDoc(authorRef);
           if (authorSnap.exists()) {
             const author = authorSnap.data();
-            setAuthorName(author.name || "");
+
             setDetailImagePreview(author.detailImages || "");
             setProfileImagePreview(author.profileImage || "");
           }
@@ -97,14 +93,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       return () => URL.revokeObjectURL(previewUrl);
     }
   }, [detailImage]);
-
-  useEffect(() => {
-    if (profileImage) {
-      const previewUrl = URL.createObjectURL(profileImage);
-      setProfileImagePreview(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl);
-    }
-  }, [profileImage]);
 
   const handleOptionGroupChange = (
     index: number,
@@ -178,8 +166,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         const mainImageRef = ref(storage, `products/${id}/main`);
         await uploadBytes(mainImageRef, mainImage);
 
-        // [Troubleshooting: CORS Error]
-        // Firebase Storage 버킷 경로가 잘못되어 있어서 에러 발생.
         mainImageUrl = await getDownloadURL(mainImageRef);
         setMainImagePreview(mainImageUrl);
       }
@@ -193,15 +179,8 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       }
 
       let profileImageUrl = profileImagePreview || "";
-      if (profileImage) {
-        const profileImageRef = ref(storage, `authors/${authorId}/profile`);
-        await uploadBytes(profileImageRef, profileImage);
-        profileImageUrl = await getDownloadURL(profileImageRef);
-        setProfileImagePreview(profileImageUrl);
-      }
 
       await setDoc(doc(db, "authors", authorId), {
-        name: authorName,
         profileImage: profileImageUrl,
         detailImages: detailImageUrl,
       });
@@ -228,11 +207,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       if (!isEdit) {
         setTitle("");
         setPrice(0);
-        setAuthorName("");
         setTags("");
         setMainImage(null);
         setDetailImage(null);
-        setProfileImage(null);
         setMainImagePreview(null);
         setDetailImagePreview(null);
         setProfileImagePreview(null);
@@ -252,7 +229,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="w-[768px] mx-auto mt-20 space-y-5">
-      <h1 className="text-3xl font-bold text-gray-800">
+      <h1 className="text-2xl font-bold text-gray-800">
         {productId ? "상품 수정" : "상품 등록"}
       </h1>
 
@@ -262,36 +239,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 기본 정보
           </h2>
-
-          {/* 프로필 이미지 */}
-          <div className="w-40 mb-4">
-            <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-              프로필
-            </label>
-            <label
-              htmlFor="profile-upload"
-              className="relative w-32 h-32 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-full overflow-hidden cursor-pointer hover:border-blue-400 transition"
-            >
-              {profileImagePreview ? (
-                <img
-                  src={profileImagePreview}
-                  alt="프로필 미리보기"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-400 text-sm text-center">
-                  이미지 업로드
-                </span>
-              )}
-            </label>
-            <input
-              id="profile-upload"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setProfileImage(e.target.files?.[0] || null)}
-              className="hidden"
-            />
-          </div>
 
           <div className="space-y-4">
             <div>
@@ -318,18 +265,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                 placeholder="예: 32000"
               />
             </div>
-            <div>
-              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-                판매자명
-              </label>
-              <input
-                type="text"
-                value={authorName}
-                onChange={(e) => setAuthorName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
-                placeholder="판매자 또는 브랜드 이름"
-              />
-            </div>
+
             <div>
               <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
                 태그
@@ -350,7 +286,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 이미지
           </h2>
-          <div className="flex space-x-6">
+          <div className="flex space-x-2">
             {/* 메인 이미지 */}
             <div className="w-40">
               <label className="block mb-2 text-gray-600 dark:text-gray-300">
@@ -358,7 +294,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
               </label>
               <label
                 htmlFor="main-upload"
-                className="relative w-40 h-40 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition"
+                className="relative w-32 h-32 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-lg overflow-hidden cursor-pointer hover:border-orange-300 transition"
               >
                 {mainImagePreview ? (
                   <img
@@ -388,7 +324,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
               </label>
               <label
                 htmlFor="detail-upload"
-                className="relative w-40 h-40 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition"
+                className="relative w-32 h-32 flex items-center justify-center bg-gray-100 border-2 border-dashed rounded-lg overflow-hidden cursor-pointer hover:border-orange-300 transition"
               >
                 {detailImagePreview ? (
                   <img

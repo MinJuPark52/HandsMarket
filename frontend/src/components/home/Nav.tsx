@@ -22,7 +22,7 @@ const Nav: React.FC<NavProps> = ({ isDarkMode, setIsDarkMode }) => {
 
   return (
     <>
-      <div className="max-w-[768px] mx-auto flex justify-between items-center p-4 fixed top-0 left-0 right-0 z-[1000] bg-[#ffffff] dark:bg-gray-800 text-black dark:text-white">
+      <div className="max-w-[768px] mx-auto flex justify-between items-center pt-4 fixed top-0 left-0 right-0 z-[1000] bg-[#ffffff] dark:bg-gray-800 text-black dark:text-white">
         <div className="flex items-center relative">
           <p className="text-orange-500 font-bold text-2xl dark:text-white italic">
             <Link to="/">HandsMarket</Link>

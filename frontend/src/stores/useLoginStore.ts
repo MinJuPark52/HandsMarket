@@ -6,14 +6,14 @@ interface LoginState {
   email: string;
   nickname: string;
   profileImage: string;
-  userType: "user" | "seller" | "";
+  userType: "buyer" | "seller" | "";
   isLoggedIn: boolean;
   setLogin: (
     uid: string,
     email: string,
     nickname: string,
     profileImage: string,
-    userType?: "user" | "seller" | ""
+    userType?: "buyer" | "seller" | ""
   ) => void;
   logout: () => void;
 }
