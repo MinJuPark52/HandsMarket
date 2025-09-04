@@ -3,20 +3,43 @@ import { useNavigate, Link } from "react-router-dom";
 import useLoginStore from "../../stores/useLoginStore";
 import { BeatLoader } from "react-spinners";
 import { GoChevronRight } from "react-icons/go";
+import axios from "axios";
 
 const Profile = () => {
-  const { email, nickname, profileImage, isLoggedIn, logout, userType } =
+  const { email, name, profile_image, isLoggedIn, logout, role, setLogin } =
     useLoginStore();
   const [isLoading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      setLoading(false);
-    }
-  }, [isLoggedIn, navigate]);
+    const fetchUserInfo = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get("http://localhost:3000/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const user = response.data;
+        setLogin(
+          user.user_id,
+          user.email,
+          user.name,
+          user.profile_image,
+          user.role
+        );
+        setLoading(false);
+      } catch (error) {
+        navigate("/login");
+      }
+    };
+
+    fetchUserInfo();
+  }, [navigate, setLogin]);
 
   const handleLogout = async () => {
     try {
@@ -41,13 +64,13 @@ const Profile = () => {
     <div className="min-h-screen max-w-[768px] mx-auto mt-20">
       <div className="bg-gray-100 h-[100px] p-6 flex items-center gap-4">
         <img
-          src={profileImage || "/default-profile.png"}
+          src={profile_image || "/default-profile.png"}
           alt="프로필 사진"
           className="w-16 h-16 rounded-full object-cover"
         />
         <div>
           <h3 className="text-xl font-semibold text-gray-800">
-            {nickname}님 안녕하세요!
+            {name}님 안녕하세요!
           </h3>
           <p className="text-md text-gray-700">{email}</p>
         </div>
@@ -68,7 +91,7 @@ const Profile = () => {
       </div>
 
       {/* 사용자 */}
-      {userType === "buyer" && (
+      {role === "buyer" && (
         <>
           <Link
             to="/reviews"
@@ -83,7 +106,7 @@ const Profile = () => {
       )}
 
       {/* 판매자 */}
-      {userType === "seller" && (
+      {role === "seller" && (
         <>
           <Link
             to="/register_seller"

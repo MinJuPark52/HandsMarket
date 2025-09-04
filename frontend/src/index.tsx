@@ -11,7 +11,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import App from "./App";
-import AuthListener from "./components/AuthListener";
 import Login from "./pages/user/login";
 import Signup from "./pages/user/signup";
 import Cart from "./pages/product/cart";
@@ -54,7 +53,6 @@ const Index = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <AuthListener />
         <RoutesWrapper isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
       </Router>
     </QueryClientProvider>

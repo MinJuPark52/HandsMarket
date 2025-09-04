@@ -2,18 +2,18 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface LoginState {
-  uid: string;
+  user_id: string;
   email: string;
-  nickname: string;
-  profileImage: string;
-  userType: "buyer" | "seller" | "";
+  name: string;
+  profile_image: string;
+  role: string;
   isLoggedIn: boolean;
   setLogin: (
-    uid: string,
+    user_id: string,
     email: string,
-    nickname: string,
-    profileImage: string,
-    userType?: "buyer" | "seller" | ""
+    name: string,
+    profile_image: string,
+    role?: string
   ) => void;
   logout: () => void;
 }
@@ -21,35 +21,32 @@ interface LoginState {
 const useLoginStore = create<LoginState>()(
   persist(
     (set) => ({
-      uid: "",
+      user_id: "",
       email: "",
-      nickname: "",
-      profileImage: "",
-      userType: "",
+      name: "",
+      profile_image: "",
+      role: "",
       isLoggedIn: false,
-      // 로그인 성공 시 사용자 정보와 로그인 상태를 저장
-      setLogin: (uid, email, nickname, profileImage, userType = "") =>
-        set({ uid, email, nickname, profileImage, userType, isLoggedIn: true }),
-      // 로그아웃 시 상태 초기화
+      setLogin: (user_id, email, name, profile_image, role = "") =>
+        set({ user_id, email, name, profile_image, role, isLoggedIn: true }),
       logout: () =>
         set({
-          uid: "",
+          user_id: "",
           email: "",
-          nickname: "",
-          profileImage: "",
-          userType: "",
+          name: "",
+          profile_image: "",
+          role: "",
           isLoggedIn: false,
         }),
     }),
     {
-      name: "login-storage", // 로컬스토리지에 저장할 이름
+      name: "login-storage",
       partialize: (state) => ({
-        // 저장할 상태의 일부만 선택
-        uid: state.uid,
+        user_id: state.user_id,
         email: state.email,
-        nickname: state.nickname,
-        profileImage: state.profileImage,
-        userType: state.userType,
+        name: state.name,
+        profile_image: state.profile_image,
+        role: state.role,
         isLoggedIn: state.isLoggedIn,
       }),
     }

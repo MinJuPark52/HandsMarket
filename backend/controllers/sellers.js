@@ -8,12 +8,12 @@ const {
 // 판매자 등록
 async function createSeller(req, res, next) {
   try {
-    const { userId, sellerName } = req.body;
+    const { user_id, sellerName } = req.body;
     const profileImage = req.file?.filename || null;
 
     const seller = await createSellerModel(
       req.pool,
-      userId,
+      user_id,
       sellerName,
       profileImage
     );

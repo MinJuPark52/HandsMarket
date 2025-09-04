@@ -7,10 +7,10 @@ async function findUserByEmail(pool, email) {
   return rows[0];
 }
 
-async function findUserById(pool, userId) {
+async function findUserById(pool, user_id) {
   const [rows] = await pool.query(
     "SELECT user_id, name, email, role FROM users WHERE user_id = ?",
-    [userId]
+    [user_id]
   );
   return rows[0];
 }
