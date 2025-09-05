@@ -56,7 +56,7 @@ const SignupPage: React.FC = () => {
         email: fullEmail,
         password: data.password,
         name: data.nickname,
-        role: userType,
+        role: role,
       });
 
       alert("회원가입이 완료되었습니다.");
