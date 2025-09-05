@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 interface ProductFormProps {
-  productId?: string;
+  id?: string;
+  onRegistered?: () => void;
 }
 
-const RegistSeller = ({ productId }: ProductFormProps) => {
+const RegistSeller = ({ id }: ProductFormProps) => {
   const navigate = useNavigate();
   const [sellerName, setSellerName] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -15,22 +16,28 @@ const RegistSeller = ({ productId }: ProductFormProps) => {
   );
 
   useEffect(() => {
-    if (!productId) return;
+    if (!id) return;
 
     const fetchSeller = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:3000/sellers/${productId}`
-        );
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:3000/sellers/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         setSellerName(res.data.seller_name || "");
-        setProfileImagePreview(res.data.profile_image || null);
+        setProfileImagePreview(
+          res.data.profile_image
+            ? `http://localhost:3000/uploads/${res.data.profile_image}`
+            : null
+        );
       } catch (err) {
         console.error("판매자 정보 불러오기 실패:", err);
       }
     };
 
     fetchSeller();
-  }, [productId]);
+  }, [id]);
 
   useEffect(() => {
     if (profileImage) {
@@ -40,18 +47,21 @@ const RegistSeller = ({ productId }: ProductFormProps) => {
     }
   }, [profileImage]);
 
+  // 등록/수정
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const isEdit = Boolean(productId);
+    const isEdit = Boolean(id);
     const url = isEdit
-      ? `http://localhost:3000/sellers/${productId}`
+      ? `http://localhost:3000/sellers/${id}`
       : `http://localhost:3000/sellers`;
 
     try {
       const formData = new FormData();
-      formData.append("sellerName", sellerName);
+      formData.append("seller_name", sellerName);
       if (profileImage) formData.append("profileImage", profileImage);
+
+      const token = localStorage.getItem("token");
 
       const res = await axios({
         method: isEdit ? "patch" : "post",
@@ -59,6 +69,7 @@ const RegistSeller = ({ productId }: ProductFormProps) => {
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       });
       console.log(res.data);
@@ -130,7 +141,7 @@ const RegistSeller = ({ productId }: ProductFormProps) => {
           type="submit"
           className="bg-orange-500 text-white py-3 rounded-lg w-full hover:bg-orange-600 transition"
         >
-          {productId ? "수정하기" : "판매자 등록하기"}
+          {id ? "수정하기" : "판매자 등록하기"}
         </button>
       </div>
     </form>

@@ -8,13 +8,14 @@ const {
 // 판매자 등록
 async function createSeller(req, res, next) {
   try {
-    const { user_id, sellerName } = req.body;
+    const { seller_name } = req.body;
     const profileImage = req.file?.filename || null;
+    const user_id = req.user.user_id;
 
     const seller = await createSellerModel(
       req.pool,
       user_id,
-      sellerName,
+      seller_name,
       profileImage
     );
 
@@ -42,11 +43,11 @@ async function getSellerById(req, res, next) {
 async function updateSeller(req, res, next) {
   try {
     const id = parseInt(req.params.id);
-    const { sellerName } = req.body;
+    const { seller_name } = req.body;
     const profileImage = req.file?.filename || null;
 
     const updates = {};
-    if (sellerName) updates.seller_name = sellerName;
+    if (seller_name) updates.seller_name = seller_name;
     if (profileImage) updates.profile_image = profileImage;
 
     const updatedSeller = await updateSellerModel(req.pool, id, updates);

@@ -1,13 +1,13 @@
 // 판매자 생성
-async function createSeller(pool, user_id, sellerName, profileImage) {
+async function createSeller(pool, user_id, seller_name, profileImage) {
   const [result] = await pool.query(
     "INSERT INTO sellers (user_id, seller_name, profile_image) VALUES (?, ?, ?)",
-    [user_id, sellerName, profileImage]
+    [user_id, seller_name, profileImage]
   );
   return {
     seller_id: result.insertId,
     user_id: user_id,
-    seller_name: sellerName,
+    seller_name: seller_name,
     profile_image: profileImage,
   };
 }
