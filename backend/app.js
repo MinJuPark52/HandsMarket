@@ -11,6 +11,9 @@ const usersRouter = require("./routes/users");
 const sellersRouter = require("./routes/sellers");
 const categoriesRouter = require("./routes/categories");
 const tagsRouter = require("./routes/tags");
+const productsRouter = require("./routes/products");
+const productImagesRouter = require("./routes/productImages");
+
 const mysql = require("mysql2/promise");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -50,6 +53,8 @@ app.use("/api/users", usersRouter);
 app.use("/api/sellers", sellersRouter);
 app.use("/api/categories", categoriesRouter);
 app.use("/api/tags", tagsRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/productImages", productImagesRouter);
 
 // 404
 app.use(function (req, res, next) {

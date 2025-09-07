@@ -19,7 +19,7 @@ interface Category {
 }
 
 interface ProductFormProps {
-  productId?: string;
+  product_id?: string;
 }
 
 interface Tag {
@@ -27,10 +27,11 @@ interface Tag {
   name: string;
 }
 
-const ProductForm = ({ productId }: ProductFormProps) => {
+const ProductForm = ({ product_id }: ProductFormProps) => {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  const [title, setTitle] = useState("");
+  const [productName, setProductName] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [tags, setTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -40,7 +41,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
   const [detailImagePreview, setDetailImagePreview] = useState<string | null>(
     null
   );
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
@@ -55,24 +55,24 @@ const ProductForm = ({ productId }: ProductFormProps) => {
   // 상품 불러오기
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!productId) return;
+      if (!product_id) return;
 
       try {
-        const { data } = await axios.get(`/api/products/${productId}`);
-        setTitle(data.title || "");
+        const { data } = await axios.get(`/api/products/${product_id}`);
+        setProductName(data.product_name || "");
         setPrice(data.price || 0);
         setTags(data.tags || []);
         setOptions(data.options || []);
         setMainImagePreview(data.imageUrl || "");
         setDetailImagePreview(data.detailImageUrl || "");
-        setSelectedCategory(data.category || "");
+        setSelectedCategory(data.category_id?.toString() || "");
       } catch (err) {
         console.error("상품 로딩 실패:", err);
       }
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [product_id]);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -86,28 +86,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       }
     };
 
-    fetchCategories();
-  }, []);
-
-  // 이미지 미리보기 처리
-  useEffect(() => {
-    if (mainImage) {
-      const previewUrl = URL.createObjectURL(mainImage);
-      setMainImagePreview(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl);
-    }
-  }, [mainImage]);
-
-  useEffect(() => {
-    if (detailImage) {
-      const previewUrl = URL.createObjectURL(detailImage);
-      setDetailImagePreview(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl);
-    }
-  }, [detailImage]);
-
-  // 태그 목록 불러오기
-  useEffect(() => {
     const fetchTags = async () => {
       try {
         const { data } = await axios.get("/api/tags");
@@ -116,8 +94,27 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         console.error("태그 로딩 실패:", error);
       }
     };
+
+    fetchCategories();
     fetchTags();
   }, []);
+
+  // 이미지 미리보기 처리
+  useEffect(() => {
+    if (mainImage) {
+      const url = URL.createObjectURL(mainImage);
+      setMainImagePreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [mainImage]);
+
+  useEffect(() => {
+    if (detailImage) {
+      const url = URL.createObjectURL(detailImage);
+      setDetailImagePreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [detailImage]);
 
   // 옵션 그룹, 옵션 값 핸들러
   const handleOptionGroupChange = (
@@ -145,12 +142,12 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     setOptions(newOptions);
   };
 
-  const addOptionGroup = () => {
-    setOptions([
-      ...options,
-      { label: "", name: "", values: [{ label: "", price: 0 }] },
-    ]);
-  };
+  // const addOptionGroup = () => {
+  //   setOptions([
+  //     ...options,
+  //     { label: "", name: "", values: [{ label: "", price: 0 }] },
+  //   ]);
+  // };
 
   const removeOptionGroup = (index: number) => {
     const newOptions = options.filter((_, i) => i !== index);
@@ -184,33 +181,68 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       return;
     }
 
+    if (!productName || !price) {
+      alert("상품명과 가격은 필수입니다.");
+      return;
+    }
+
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("price", price.toString());
-      formData.append("tags", JSON.stringify(tags));
-      formData.append("options", JSON.stringify(options));
-      formData.append("category", selectedCategory);
+      let savedProductId = product_id;
 
-      if (mainImage) formData.append("mainImage", mainImage);
-      if (detailImage) formData.append("detailImage", detailImage);
-
-      if (productId) {
-        await axios.put(`/api/products/${productId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        alert("상품이 성공적으로 수정되었습니다!");
+      if (!product_id) {
+        const res = await axios.post(
+          "/api/products",
+          {
+            product_name: productName,
+            price,
+            category_id: selectedCategory,
+            options,
+            tags,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        savedProductId = res.data.product_id;
       } else {
-        await axios.post("/api/products", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        alert("상품이 성공적으로 등록되었습니다!");
+        await axios.put(
+          `/api/products/${product_id}`,
+          {
+            product_name: productName,
+            price,
+            category_id: selectedCategory,
+            options,
+            tags,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
       }
 
+      if (mainImage || detailImage) {
+        const formData = new FormData();
+        formData.append("product_id", savedProductId!);
+        if (mainImage) formData.append("thumbnail", mainImage);
+        if (detailImage) formData.append("image", detailImage);
+
+        await axios.post("/api/productImages", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+
+      alert(product_id ? "상품 수정 완료" : "상품 등록 완료");
       navigate("/");
 
-      if (!productId) {
-        setTitle("");
+      if (!product_id) {
+        setProductName("");
         setPrice(0);
         setTags([]);
         setMainImage(null);
@@ -226,93 +258,88 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         ]);
       }
     } catch (err) {
-      console.error("상품 등록/수정 실패:", err);
-      alert("처리 중 오류가 발생했습니다.");
+      console.error(err);
+      alert("상품 등록/수정 중 오류가 발생했습니다.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="w-[768px] mx-auto mt-20 space-y-5">
       <h1 className="text-xl font-bold text-gray-800">
-        {productId ? "상품 수정" : "상품 등록"}
+        {product_id ? "상품 수정" : "상품 등록"}
       </h1>
 
-      <div className="shadow-sm rounded-lg p-8 space-y-10 border border-gray-200">
+      <div className="space-y-5">
         {/* 상품 정보 */}
-        <section>
-          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
-            상품 기본 정보
-          </h3>
+        <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+          상품 기본 정보
+        </h3>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-                상품명
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none dark:text-gray-600"
-                placeholder="예: 레드로즈 부케"
-              />
-            </div>
-            <div>
-              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-                판매가
-              </label>
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
-                placeholder="예: 32000"
-              />
-            </div>
+        <div>
+          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
+            상품명
+          </label>
+          <input
+            type="text"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none dark:text-gray-600"
+            placeholder="상품명을 입력해주세요"
+          />
+        </div>
 
-            <section>
-              <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
-                태그 선택
-              </h3>
-              <div className="grid grid-cols-4 gap-3">
-                {allTags.map((tag) => {
-                  const isSelected = tags.includes(tag.id);
-                  return (
-                    <label
-                      key={tag.id}
-                      className={`cursor-pointer rounded border px-4 py-2 text-center select-none 
+        <div>
+          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
+            판매가
+          </label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
+            placeholder="판매가를 입력해주세요"
+          />
+        </div>
+
+        <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+          태그 선택
+        </h3>
+        <div className="grid grid-cols-4 gap-3">
+          {allTags.map((tag) => {
+            const isSelected = tags.includes(tag.id);
+            return (
+              <label
+                key={tag.id}
+                className={`cursor-pointer rounded border px-4 py-2 text-center select-none 
             ${
               isSelected
                 ? "text-orange-400 border-orange-400"
                 : "border-gray-200 hover:bg-gray-50"
             }`}
-                    >
-                      <input
-                        type="checkbox"
-                        value={tag.id}
-                        checked={isSelected}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            if (tags.length < 3) {
-                              setTags([...tags, tag.id]);
-                            } else {
-                              alert("태그는 최대 3개까지 선택 가능합니다.");
-                              e.preventDefault();
-                            }
-                          } else {
-                            setTags(tags.filter((id) => id !== tag.id));
-                          }
-                        }}
-                        className="hidden"
-                      />
-                      <span>{tag.name}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </section>
-          </div>
-        </section>
+              >
+                <input
+                  type="checkbox"
+                  value={tag.id}
+                  checked={isSelected}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      if (tags.length < 3) {
+                        setTags([...tags, tag.id]);
+                      } else {
+                        alert("태그는 최대 3개까지 선택 가능합니다.");
+                        e.preventDefault();
+                      }
+                    } else {
+                      setTags(tags.filter((id) => id !== tag.id));
+                    }
+                  }}
+                  className="hidden"
+                />
+                <span>{tag.name}</span>
+              </label>
+            );
+          })}
+        </div>
 
         <div>
           <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
@@ -408,12 +435,15 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
         {/* 옵션 */}
         <section>
-          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300">
             상품 옵션
           </h3>
           {options.map((group, groupIndex) => (
-            <div key={groupIndex} className="bg-gray-50 p-4 rounded-lg mb-4">
-              <div className="flex items-center gap-4 mb-2">
+            <div
+              key={groupIndex}
+              className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 mt-2"
+            >
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-2">
                 <input
                   type="text"
                   placeholder="옵션명 (예: 색상)"
@@ -421,7 +451,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                   onChange={(e) =>
                     handleOptionGroupChange(groupIndex, "label", e.target.value)
                   }
-                  className="flex-1 border rounded px-2 py-2 focus:outline-none dark:text-gray-600"
+                  className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-200"
                 />
                 <input
                   type="text"
@@ -430,17 +460,21 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                   onChange={(e) =>
                     handleOptionGroupChange(groupIndex, "name", e.target.value)
                   }
-                  className="flex-1 border rounded px-2 py-2 focus:outline-none dark:text-gray-600"
+                  className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-200"
                 />
                 <button
                   onClick={() => removeOptionGroup(groupIndex)}
-                  className="text-red-400 border-red-400 border px-3 py-2 rounded"
+                  className="text-orange-500 border border-orange-300 px-4 py-2 rounded hover:text-orange-500 hover:border-orange-500 transition-colors"
                 >
                   삭제
                 </button>
               </div>
+
               {group.values.map((value, valueIndex) => (
-                <div key={valueIndex} className="flex items-center gap-4 mb-2">
+                <div
+                  key={valueIndex}
+                  className="flex flex-col md:flex-row md:items-center gap-4 mb-3"
+                >
                   <input
                     type="text"
                     placeholder="옵션 값"
@@ -453,7 +487,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                         e.target.value
                       )
                     }
-                    className="flex-1 border rounded p-2 focus:outline-none dark:text-gray-600"
+                    className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-200"
                   />
                   <input
                     type="number"
@@ -467,33 +501,27 @@ const ProductForm = ({ productId }: ProductFormProps) => {
                         Number(e.target.value)
                       )
                     }
-                    className="flex-1 border rounded p-2 focus:outline-none dark:text-gray-600"
+                    className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-200"
                   />
                   <button
                     type="button"
                     onClick={() => removeOptionValue(groupIndex, valueIndex)}
-                    className="text-red-400 border-red-400 border px-3 py-2 rounded"
+                    className="text-orange-500 border border-orange-300 px-4 py-2 rounded hover:text-orange-500 hover:border-orange-500 transition-colors"
                   >
                     삭제
                   </button>
                 </div>
               ))}
+
               <button
                 type="button"
                 onClick={() => addOptionValue(groupIndex)}
-                className="text-md text-blue-500"
+                className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-5 py-2 rounded transition"
               >
                 + 옵션 값 추가
               </button>
             </div>
           ))}
-          <button
-            type="button"
-            onClick={addOptionGroup}
-            className="text-gray-600 border bg-gray-50 px-4 py-2 rounded"
-          >
-            + 옵션 그룹 추가
-          </button>
         </section>
 
         {/* 제출 */}
@@ -502,7 +530,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
             type="submit"
             className="bg-orange-500 text-white py-3 rounded-lg w-full hover:bg-orange-600 transition"
           >
-            {productId ? "상품 수정하기" : "상품 등록하기"}
+            {product_id ? "상품 수정하기" : "상품 등록하기"}
           </button>
         </div>
       </div>
