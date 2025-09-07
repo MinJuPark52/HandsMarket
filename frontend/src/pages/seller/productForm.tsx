@@ -22,12 +22,18 @@ interface ProductFormProps {
   productId?: string;
 }
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 const ProductForm = ({ productId }: ProductFormProps) => {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState<number>(0);
-  const [tags, setTags] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [allTags, setAllTags] = useState<Tag[]>([]);
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [detailImage, setDetailImage] = useState<File | null>(null);
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
@@ -55,7 +61,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         const { data } = await axios.get(`/api/products/${productId}`);
         setTitle(data.title || "");
         setPrice(data.price || 0);
-        setTags((data.tags || []).join(", "));
+        setTags(data.tags || []);
         setOptions(data.options || []);
         setMainImagePreview(data.imageUrl || "");
         setDetailImagePreview(data.detailImageUrl || "");
@@ -99,6 +105,19 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       return () => URL.revokeObjectURL(previewUrl);
     }
   }, [detailImage]);
+
+  // 태그 목록 불러오기
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const { data } = await axios.get("/api/tags");
+        setAllTags(data);
+      } catch (error) {
+        console.error("태그 로딩 실패:", error);
+      }
+    };
+    fetchTags();
+  }, []);
 
   // 옵션 그룹, 옵션 값 핸들러
   const handleOptionGroupChange = (
@@ -169,7 +188,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("price", price.toString());
-      formData.append("tags", tags);
+      formData.append("tags", JSON.stringify(tags));
       formData.append("options", JSON.stringify(options));
       formData.append("category", selectedCategory);
 
@@ -193,7 +212,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
       if (!productId) {
         setTitle("");
         setPrice(0);
-        setTags("");
+        setTags([]);
         setMainImage(null);
         setDetailImage(null);
         setMainImagePreview(null);
@@ -251,18 +270,47 @@ const ProductForm = ({ productId }: ProductFormProps) => {
               />
             </div>
 
-            <div>
-              <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-                태그
-              </label>
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none dark:text-gray-600"
-                placeholder="예: 꽃, 부케, 로즈 (쉼표로 구분)"
-              />
-            </div>
+            <section>
+              <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+                태그 선택
+              </h3>
+              <div className="grid grid-cols-4 gap-3">
+                {allTags.map((tag) => {
+                  const isSelected = tags.includes(tag.id);
+                  return (
+                    <label
+                      key={tag.id}
+                      className={`cursor-pointer rounded border px-4 py-2 text-center select-none 
+            ${
+              isSelected
+                ? "text-orange-400 border-orange-400"
+                : "border-gray-200 hover:bg-gray-50"
+            }`}
+                    >
+                      <input
+                        type="checkbox"
+                        value={tag.id}
+                        checked={isSelected}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            if (tags.length < 3) {
+                              setTags([...tags, tag.id]);
+                            } else {
+                              alert("태그는 최대 3개까지 선택 가능합니다.");
+                              e.preventDefault();
+                            }
+                          } else {
+                            setTags(tags.filter((id) => id !== tag.id));
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      <span>{tag.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </section>
           </div>
         </section>
 

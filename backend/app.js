@@ -10,6 +10,7 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const sellersRouter = require("./routes/sellers");
 const categoriesRouter = require("./routes/categories");
+const tagsRouter = require("./routes/tags");
 const mysql = require("mysql2/promise");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -44,10 +45,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/sellers", sellersRouter);
+app.use("/api/", indexRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/sellers", sellersRouter);
 app.use("/api/categories", categoriesRouter);
+app.use("/api/tags", tagsRouter);
 
 // 404
 app.use(function (req, res, next) {
