@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import { db, storage } from "../../firebase/firebaseConfig";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface OptionValue {
   label: string;
@@ -16,12 +13,18 @@ interface OptionGroup {
   values: OptionValue[];
 }
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 interface ProductFormProps {
   productId?: string;
 }
 
 const ProductForm = ({ productId }: ProductFormProps) => {
   const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [tags, setTags] = useState<string>("");
@@ -31,9 +34,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
   const [detailImagePreview, setDetailImagePreview] = useState<string | null>(
     null
   );
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
-    null
-  );
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const [options, setOptions] = useState<OptionGroup[]>([
     {
@@ -43,33 +46,20 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     },
   ]);
 
-  const authorId = "author_015";
-
+  // 상품 불러오기
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) return;
 
       try {
-        const productRef = doc(db, "product", productId);
-        const productSnap = await getDoc(productRef);
-
-        if (productSnap.exists()) {
-          const data = productSnap.data();
-          setTitle(data.title || "");
-          setPrice(data.price || 0);
-          setTags((data.tags || []).join(", "));
-          setOptions(data.options || []);
-          setMainImagePreview(data.image || "");
-
-          const authorRef = doc(db, "authors", data.authorId);
-          const authorSnap = await getDoc(authorRef);
-          if (authorSnap.exists()) {
-            const author = authorSnap.data();
-
-            setDetailImagePreview(author.detailImages || "");
-            setProfileImagePreview(author.profileImage || "");
-          }
-        }
+        const { data } = await axios.get(`/api/products/${productId}`);
+        setTitle(data.title || "");
+        setPrice(data.price || 0);
+        setTags((data.tags || []).join(", "));
+        setOptions(data.options || []);
+        setMainImagePreview(data.imageUrl || "");
+        setDetailImagePreview(data.detailImageUrl || "");
+        setSelectedCategory(data.category || "");
       } catch (err) {
         console.error("상품 로딩 실패:", err);
       }
@@ -78,6 +68,22 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     fetchProduct();
   }, [productId]);
 
+  // 카테고리 불러오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get("/api/categories");
+        setCategories(data);
+        if (data.length > 0) setSelectedCategory(data[0].id);
+      } catch (err) {
+        console.error("카테고리 로딩 실패:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // 이미지 미리보기 처리
   useEffect(() => {
     if (mainImage) {
       const previewUrl = URL.createObjectURL(mainImage);
@@ -94,6 +100,7 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     }
   }, [detailImage]);
 
+  // 옵션 그룹, 옵션 값 핸들러
   const handleOptionGroupChange = (
     index: number,
     field: "label" | "name",
@@ -145,11 +152,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     setOptions(newOptions);
   };
 
+  // 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const isEdit = Boolean(productId);
-    const id = isEdit ? productId! : uuidv4();
 
     if (!mainImage && !mainImagePreview) {
       alert("대표 이미지를 업로드해주세요.");
@@ -161,50 +166,31 @@ const ProductForm = ({ productId }: ProductFormProps) => {
     }
 
     try {
-      let mainImageUrl = mainImagePreview || "";
-      if (mainImage) {
-        const mainImageRef = ref(storage, `products/${id}/main`);
-        await uploadBytes(mainImageRef, mainImage);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("price", price.toString());
+      formData.append("tags", tags);
+      formData.append("options", JSON.stringify(options));
+      formData.append("category", selectedCategory);
 
-        mainImageUrl = await getDownloadURL(mainImageRef);
-        setMainImagePreview(mainImageUrl);
-      }
+      if (mainImage) formData.append("mainImage", mainImage);
+      if (detailImage) formData.append("detailImage", detailImage);
 
-      let detailImageUrl = detailImagePreview || "";
-      if (detailImage) {
-        const detailImageRef = ref(storage, `authors/${authorId}/detail`);
-        await uploadBytes(detailImageRef, detailImage);
-        detailImageUrl = await getDownloadURL(detailImageRef);
-        setDetailImagePreview(detailImageUrl);
-      }
-
-      let profileImageUrl = profileImagePreview || "";
-
-      await setDoc(doc(db, "authors", authorId), {
-        profileImage: profileImageUrl,
-        detailImages: detailImageUrl,
-      });
-
-      const productData = {
-        title,
-        price,
-        image: mainImageUrl,
-        authorId,
-        tags: tags.split(",").map((tag) => tag.trim()),
-        options,
-      };
-
-      if (isEdit) {
-        await updateDoc(doc(db, "product", id), productData);
+      if (productId) {
+        await axios.put(`/api/products/${productId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         alert("상품이 성공적으로 수정되었습니다!");
       } else {
-        await setDoc(doc(db, "product", id), productData);
+        await axios.post("/api/products", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         alert("상품이 성공적으로 등록되었습니다!");
       }
 
       navigate("/");
 
-      if (!isEdit) {
+      if (!productId) {
         setTitle("");
         setPrice(0);
         setTags("");
@@ -212,7 +198,6 @@ const ProductForm = ({ productId }: ProductFormProps) => {
         setDetailImage(null);
         setMainImagePreview(null);
         setDetailImagePreview(null);
-        setProfileImagePreview(null);
         setOptions([
           {
             label: "사이즈",
@@ -229,16 +214,16 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="w-[768px] mx-auto mt-20 space-y-5">
-      <h1 className="text-2xl font-bold text-gray-800">
+      <h1 className="text-xl font-bold text-gray-800">
         {productId ? "상품 수정" : "상품 등록"}
       </h1>
 
       <div className="shadow-sm rounded-lg p-8 space-y-10 border border-gray-200">
         {/* 상품 정보 */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 기본 정보
-          </h2>
+          </h3>
 
           <div className="space-y-4">
             <div>
@@ -281,11 +266,35 @@ const ProductForm = ({ productId }: ProductFormProps) => {
           </div>
         </section>
 
+        <div>
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+            카테고리
+          </h3>
+          <div className="flex flex-wrap gap-4">
+            {categories.map((cat) => (
+              <label
+                key={cat.id}
+                className="inline-flex items-center space-x-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="category"
+                  value={cat.id}
+                  checked={selectedCategory === cat.id}
+                  onChange={() => setSelectedCategory(cat.id)}
+                  className="form-radio text-orange-500"
+                />
+                <span>{cat.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
         {/* 이미지 업로드 */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 이미지
-          </h2>
+          </h3>
           <div className="flex space-x-2">
             {/* 메인 이미지 */}
             <div className="w-40">
@@ -351,9 +360,9 @@ const ProductForm = ({ productId }: ProductFormProps) => {
 
         {/* 옵션 */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-2">
             상품 옵션
-          </h2>
+          </h3>
           {options.map((group, groupIndex) => (
             <div key={groupIndex} className="bg-gray-50 p-4 rounded-lg mb-4">
               <div className="flex items-center gap-4 mb-2">

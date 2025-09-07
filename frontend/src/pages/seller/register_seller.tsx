@@ -21,14 +21,14 @@ const RegistSeller = ({ id }: ProductFormProps) => {
     const fetchSeller = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:3000/sellers/${id}`, {
+        const res = await axios.get(`/api/sellers/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         setSellerName(res.data.seller_name || "");
         setProfileImagePreview(
           res.data.profile_image
-            ? `http://localhost:3000/uploads/${res.data.profile_image}`
+            ? `/api/uploads/${res.data.profile_image}`
             : null
         );
       } catch (err) {
@@ -52,9 +52,7 @@ const RegistSeller = ({ id }: ProductFormProps) => {
     e.preventDefault();
 
     const isEdit = Boolean(id);
-    const url = isEdit
-      ? `http://localhost:3000/sellers/${id}`
-      : `http://localhost:3000/sellers`;
+    const url = isEdit ? `/api/sellers/${id}` : `/api/sellers`;
 
     try {
       const formData = new FormData();

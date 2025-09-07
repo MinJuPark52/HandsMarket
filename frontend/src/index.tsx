@@ -85,7 +85,8 @@ const RoutesWrapper = ({
         <Route path="/profile" element={<Profile />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/searchresult" element={<SearchResults />} />
-        <Route path="/productform/:productId" element={<ProductForm />} />
+        <Route path="/productform" element={<ProductForm />} />
+        <Route path="/productform/:productId" element={<ProductForm />} />{" "}
         <Route path="/productlist" element={<ProductList />} />
         <Route path="/editor" element={<EditProfile />} />
         <Route path="/product/:id" element={<ProductDetail />} />

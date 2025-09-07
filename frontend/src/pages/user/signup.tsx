@@ -52,7 +52,7 @@ const SignupPage: React.FC = () => {
     const role = userType === "buyer" ? "user" : "seller";
 
     try {
-      await axios.post("http://localhost:3000/users/signup", {
+      await axios.post("/api/users/signup", {
         email: fullEmail,
         password: data.password,
         name: data.nickname,

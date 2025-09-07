@@ -9,6 +9,7 @@ const logger = require("morgan");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const sellersRouter = require("./routes/sellers");
+const categoriesRouter = require("./routes/categories");
 const mysql = require("mysql2/promise");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -46,6 +47,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/sellers", sellersRouter);
+app.use("/api/categories", categoriesRouter);
 
 // 404
 app.use(function (req, res, next) {
