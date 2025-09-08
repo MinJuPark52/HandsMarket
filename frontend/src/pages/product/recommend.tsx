@@ -1,62 +1,32 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  limit,
-  DocumentData,
-} from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
 import { BeatLoader } from "react-spinners";
 
 interface Product {
-  id: string;
-  title: string;
-  image: string;
+  product_id: number;
+  product_name: string;
   price: number;
-  tags?: string[];
+  images?: string[];
 }
 
 interface RecommendProps {
-  tags: string[];
   currentProductId: string;
+  tags?: string[];
 }
 
 const fetchRecommendedProducts = async (
-  tags: string[],
   currentProductId: string
 ): Promise<Product[]> => {
-  if (!tags || tags.length === 0) return [];
-
-  const productsRef = collection(db, "product");
-  const q = query(
-    productsRef,
-    where("tags", "array-contains-any", tags),
-    limit(5)
-  );
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs
-    .map((doc) => {
-      const data = doc.data() as DocumentData;
-      return {
-        id: doc.id,
-        title: data.title,
-        image: data.image,
-        price: data.price,
-        tags: data.tags,
-      };
-    })
-    .filter((p) => p.id !== currentProductId);
+  const res = await fetch(`/api/recommend/${currentProductId}`);
+  if (!res.ok) throw new Error("Failed to fetch recommended products");
+  return res.json();
 };
 
-const Recommend: React.FC<RecommendProps> = ({ tags, currentProductId }) => {
+const Recommend: React.FC<RecommendProps> = ({ currentProductId }) => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["recommended", tags, currentProductId],
-    queryFn: () => fetchRecommendedProducts(tags, currentProductId),
-    enabled: tags.length > 0,
+    queryKey: ["recommended", currentProductId],
+    queryFn: () => fetchRecommendedProducts(currentProductId),
+    enabled: !!currentProductId,
   });
 
   if (isLoading)
@@ -75,16 +45,21 @@ const Recommend: React.FC<RecommendProps> = ({ tags, currentProductId }) => {
       <ul className="grid grid-cols-4 gap-6">
         {data.map((product) => (
           <li
-            key={product.id}
+            key={product.product_id}
             className="cursor-pointer"
-            onClick={() => (window.location.href = `/product/${product.id}`)}
+            onClick={() =>
+              (window.location.href = `/product/${product.product_id}`)
+            }
           >
             <img
-              src={product.image}
-              alt={product.title}
+              src={product.images?.[0] || "/placeholder.png"}
+              alt={product.product_name}
               className="w-full h-40 object-cover rounded"
             />
-            <h4 className="mt-2">{product.title}</h4>
+            <h4 className="mt-2">{product.product_name}</h4>
+            <p className="text-orange-500 font-semibold">
+              {product.price.toLocaleString()}원
+            </p>
           </li>
         ))}
       </ul>

@@ -4,11 +4,9 @@ import Recommend from "../product/recommend";
 
 interface CategoryProps {
   product: {
-    id: string;
+    product_id: number;
     tags?: string[];
-    author?: {
-      detailImages?: string;
-    };
+    images?: string[];
   };
 }
 
@@ -53,12 +51,19 @@ const Category: React.FC<CategoryProps> = ({ product }) => {
       <div className="p-2">
         {activeTab === "details" && (
           <div>
-            {product.author?.detailImages && (
-              <img
-                src={product.author.detailImages}
-                alt="상품 상세 이미지"
-                className="w-full h-auto"
-              />
+            {product.images && product.images.length > 1 ? (
+              product.images
+                .slice(1)
+                .map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`상품 상세 이미지 ${idx + 1}`}
+                    className="w-full h-auto mb-4"
+                  />
+                ))
+            ) : (
+              <p className="text-gray-500">상세 이미지가 없습니다.</p>
             )}
           </div>
         )}
@@ -73,7 +78,7 @@ const Category: React.FC<CategoryProps> = ({ product }) => {
           <div>
             <Recommend
               tags={product.tags || []}
-              currentProductId={product.id}
+              currentProductId={String(product.product_id)}
             />
           </div>
         )}

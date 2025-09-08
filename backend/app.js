@@ -13,6 +13,7 @@ const categoriesRouter = require("./routes/categories");
 const tagsRouter = require("./routes/tags");
 const productsRouter = require("./routes/products");
 const productImagesRouter = require("./routes/productImages");
+const recommendRouter = require("./routes/recommend");
 
 const mysql = require("mysql2/promise");
 const app = express();
@@ -55,6 +56,7 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/tags", tagsRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/productImages", productImagesRouter);
+app.use("/api/recommend", recommendRouter);
 
 // 404
 app.use(function (req, res, next) {
