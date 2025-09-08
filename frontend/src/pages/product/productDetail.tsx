@@ -1,20 +1,18 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
 import { FiHeart } from "react-icons/fi";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { GoX } from "react-icons/go";
 import Category from "./productCategory";
 import { BeatLoader } from "react-spinners";
 import useLoginStore from "../../stores/useLoginStore";
+import axios from "axios";
 
 interface ProductOptionValue {
   label: string;
   price: number;
 }
-
 interface ProductOption {
   name: string;
   label: string;
@@ -22,15 +20,16 @@ interface ProductOption {
 }
 
 interface Product {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
+  product_id: number;
+  product_name: string;
   price: number;
   options?: ProductOption[];
-  authorId?: string;
-  author?: Author;
-  tags?: string[];
+  images?: string[];
+  seller?: {
+    seller_id: number;
+    seller_name: string;
+    profile_image?: string;
+  };
 }
 
 interface SelectedCombo {
@@ -38,56 +37,25 @@ interface SelectedCombo {
   quantity: number;
 }
 
-interface Author {
-  name: string;
-  profileImage: string;
-  detailImages?: string;
-}
-
-const fetchProductById = async (id: string): Promise<Product | null> => {
-  const docRef = doc(db, "product", id);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const data = docSnap.data() as Partial<Product>;
-
-    let author: Author | undefined = undefined;
-
-    if (data.authorId) {
-      const authorRef = doc(db, "authors", data.authorId);
-      const authorSnap = await getDoc(authorRef);
-      if (authorSnap.exists()) {
-        const authorData = authorSnap.data() as Author;
-        author = {
-          name: authorData.name ?? "",
-          profileImage: authorData.profileImage ?? "",
-          detailImages: authorData.detailImages ?? "",
-        };
-      }
-    }
-    const tags = data.tags ?? [];
-
-    return {
-      id: docSnap.id,
-      image: data.image ?? "",
-      title: data.title ?? "",
-      description: data.description ?? "",
-      price: Number(data.price ?? 0),
-      options: data.options ?? [],
-      authorId: data.authorId,
-      author,
-      tags,
-    };
-  }
-
-  return null;
+const fetchProductById = async (id: string): Promise<Product> => {
+  const { data: product } = await axios.get(`/api/products/${id}`);
+  const { data: images } = await axios.get(`/api/productImages/${id}`);
+  return {
+    ...product,
+    images: images.map((img: any) => img.image),
+    seller: {
+      seller_id: product.seller_id,
+      seller_name: product.seller_name,
+      profile_image: product.profile_image,
+    },
+  };
 };
 
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { uid } = useLoginStore();
-  const isLoggedIn = Boolean(uid);
+  const { user_id } = useLoginStore();
+  const isLoggedIn = Boolean(user_id);
 
   const {
     data: product,
@@ -103,6 +71,7 @@ const ProductDetailPage = () => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: ProductOptionValue;
   }>({});
+
   // 선택 완료된 옵션 조합 리스트 (옵션 + 수량)
   const [selectedCombinations, setSelectedCombinations] = useState<
     SelectedCombo[]
@@ -206,33 +175,30 @@ const ProductDetailPage = () => {
         <div className="w-[768px] flex gap-4">
           <div className="w-[500px] h-[550px]">
             <img
-              src={product.image}
-              alt={product.title}
+              src={product.images?.[0] || "/placeholder.png"}
+              alt={product.product_name}
               className="w-full h-full object-cover"
             />
           </div>
 
           <div className="w-[512px] px-4 flex flex-col">
-            {product.author && (
-              <div className="flex items-center gap-2 mb-2 text-md text-gray-700 dark:text-gray-300">
-                <img
-                  src={product.author.profileImage}
-                  alt={product.author.name}
-                  className="w-9 h-9 rounded-full"
-                />
-                <span className="font-medium">{product.author.name}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 mb-2 text-md text-gray-700 dark:text-gray-300">
+              <img
+                src={product.seller?.profile_image || "/placeholder.png"}
+                alt={product.seller?.seller_name}
+                className="w-9 h-9 rounded-full"
+              />
+              <span className="font-medium">{product.seller?.seller_name}</span>{" "}
+            </div>
 
             <div className="flex justify-between items-center">
-              <h2 className="mb-2 text-xl">{product.title}</h2>
+              <h2 className="mb-2 text-xl">{product.product_name}</h2>
               <div className="flex gap-2 ml-auto">
                 <FiHeart className="text-2xl" />
                 <IoShareSocialOutline className="text-2xl ml-2" />
               </div>
             </div>
 
-            <p>{product.description}</p>
             <p className="text-xl font-semibold mt-2">
               {product.price.toLocaleString()}
               <span className="font-light">원</span>

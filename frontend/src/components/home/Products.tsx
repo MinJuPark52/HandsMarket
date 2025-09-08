@@ -1,25 +1,31 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { db } from "../../firebase/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
 import { BeatLoader } from "react-spinners";
 import { MdErrorOutline } from "react-icons/md";
+import axios from "axios";
 
 interface Product {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
+  product_id: string;
+  product_name: string;
   price: number;
+  thumbnailUrl?: string;
 }
 
 const fetchProducts = async (): Promise<Product[]> => {
-  const querySnapshot = await getDocs(collection(db, "product"));
-  const products: Product[] = querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Product[];
-  return products;
+  const { data } = await axios.get("/api/products");
+
+  const productsWithImages = await Promise.all(
+    data.map(async (product: Product) => {
+      try {
+        const res = await axios.get(`/api/productImages/${product.product_id}`);
+        return { ...product, thumbnailUrl: res.data[0]?.url || "" };
+      } catch {
+        return { ...product, thumbnailUrl: "" };
+      }
+    })
+  );
+
+  return productsWithImages;
 };
 
 const Products = () => {
@@ -57,19 +63,19 @@ const Products = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {productList.map((product: Product) => (
             <div
-              key={product.id}
+              key={product.product_id}
               className="flex flex-col bg-white rounded-lg relative"
             >
-              <Link to={`/product/${product.id}`}>
+              <Link to={`/product/${product.product_id}`}>
                 <img
-                  src={product.image}
-                  alt={product.title}
+                  src={product.thumbnailUrl || "/no-image.png"}
+                  alt={product.product_name}
                   className="h-[150px] w-full mb-1 object-cover rounded-t-lg"
                 />
               </Link>
 
               <p className="px-2 pt-1 text-left text-lg dark:text-black truncate overflow-hidden whitespace-nowrap">
-                {product.title}
+                {product.product_name}
               </p>
 
               <p className="px-2 pb-1 text-left font-semibold text-lg dark:text-black mb-2">
