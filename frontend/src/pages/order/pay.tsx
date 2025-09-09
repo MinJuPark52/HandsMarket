@@ -7,9 +7,9 @@ import OrdererInfo from "./orderInfo";
 import Payment from "../order/payment";
 
 const schema = z.object({
-  name: z.string().min(1, "이름을 입력해주세요"),
-  phone: z.string().min(10, "전화번호를 입력해주세요"),
-  email: z.string().email("이메일 형식이 아닙니다").optional(),
+  customer_name: z.string().min(1, "이름을 입력해주세요"),
+  contact_phone: z.string().min(10, "전화번호를 입력해주세요"),
+  contact_email: z.string().email("이메일 형식이 아닙니다").optional(),
   address: z.string().min(1, "주소를 입력해주세요"),
   request: z.string().optional(),
   payment: z.enum(["card", "bank", "phone"]),
@@ -18,6 +18,7 @@ const schema = z.object({
 export type FormData = z.infer<typeof schema>;
 
 type ProductForPay = {
+  product_id: number;
   name: string;
   options: string;
   quantity: number;
@@ -80,6 +81,7 @@ const Pay: React.FC = () => {
           const price = (product.price + optionPrice) * (combo.quantity || 1);
 
           return {
+            product_id: product.id || 0,
             name: product.title,
             options: optionsText,
             quantity: combo.quantity || 1,
@@ -96,6 +98,7 @@ const Pay: React.FC = () => {
 
         setProducts([
           {
+            product_id: baseProduct.id || 0,
             name: baseProduct.title,
             options: "",
             quantity: 1,
@@ -110,15 +113,15 @@ const Pay: React.FC = () => {
   }, []);
 
   const validateForm = (): boolean => {
-    if (!watch("name")) {
+    if (!watch("customer_name")) {
       alert("주문자 이름을 입력해주세요.");
       return false;
     }
-    if (!watch("phone")) {
+    if (!watch("contact_phone")) {
       alert("연락처를 입력해주세요.");
       return false;
     }
-    const email = watch("email");
+    const email = watch("contact_email");
     if (email && !/\S+@\S+\.\S+/.test(email)) {
       alert("이메일을 입력해주세요.");
       return false;
@@ -225,11 +228,10 @@ const Pay: React.FC = () => {
           <Payment
             products={products}
             buyer={{
-              name: watch("name"),
-              email: watch("email") || "",
-              tel: watch("phone"),
+              customer_name: watch("customer_name"),
+              contact_phone: watch("contact_phone"),
+              contact_email: watch("contact_email") || "",
               address: watch("address"),
-              postcode: "00000",
             }}
             paymentMethod={watch("payment")}
             validateForm={validateForm}

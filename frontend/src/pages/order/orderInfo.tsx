@@ -13,36 +13,42 @@ const OrdererInfo: React.FC<OrdererInfoProps> = ({ register, errors }) => {
       <div className="flex items-center gap-2">
         <label className="w-[100px] text-gray-700">주문자</label>
         <input
-          {...register("name")}
+          {...register("customer_name")}
           placeholder="이름을 입력하세요"
           className="flex-1 border px-3 py-2 rounded-md h-[45px] focus:outline-none focus:border-gray-400"
         />
-        {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+        {errors.customer_name && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.customer_name.message}
+          </p>
         )}
       </div>
 
       <div className="flex items-center gap-2">
         <label className="w-[100px] text-gray-700">연락처</label>
         <input
-          {...register("phone")}
+          {...register("contact_phone")}
           placeholder="- 없이 입력해주세요"
           className="flex-1 border px-3 py-2 rounded-md h-[45px] focus:outline-none focus:border-gray-400"
         />
-        {errors.phone && (
-          <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+        {errors.contact_phone && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.contact_phone.message}
+          </p>
         )}
       </div>
 
       <div className="flex items-center gap-2">
         <label className="w-[100px] text-gray-700">이메일 주소</label>
         <input
-          {...register("email")}
+          {...register("contact_email")}
           placeholder="example@naver.com"
           className="flex-1 border px-3 py-2 rounded-md h-[45px] focus:outline-none focus:border-gray-400"
         />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+        {errors.contact_email && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.contact_email.message}
+          </p>
         )}
       </div>
 

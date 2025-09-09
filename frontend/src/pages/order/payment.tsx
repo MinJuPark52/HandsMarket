@@ -1,6 +1,4 @@
 import React from "react";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { getApp } from "firebase/app";
 
 declare global {
   interface Window {
@@ -9,18 +7,18 @@ declare global {
 }
 
 type Product = {
+  product_id: number;
   name: string;
-  options: string;
+  options?: string;
   quantity: number;
   price: number;
 };
 
 type Buyer = {
-  name: string;
-  email: string;
-  tel: string;
+  customer_name: string;
+  contact_phone: string;
+  contact_email: string;
   address: string;
-  postcode: string;
 };
 
 type PaymentPageProps = {
@@ -36,8 +34,6 @@ const Payment: React.FC<PaymentPageProps> = ({
   paymentMethod,
   validateForm,
 }) => {
-  const db = getFirestore(getApp());
-
   const totalPrice = products.reduce(
     (sum, product) => sum + product.price * product.quantity,
     0
@@ -74,32 +70,45 @@ const Payment: React.FC<PaymentPageProps> = ({
       merchant_uid: `mid_${Date.now()}`,
       name: products[0]?.name || "상품",
       amount: totalPrice,
-      buyer_email: buyer.email,
-      buyer_name: buyer.name,
-      buyer_tel: buyer.tel,
+      buyer_email: buyer.contact_email,
+      buyer_name: buyer.customer_name,
+      buyer_tel: buyer.contact_phone,
       buyer_addr: buyer.address,
-      buyer_postcode: buyer.postcode,
     };
 
     // 결제 요청
     IMP.request_pay(paymentData, async (rsp: any) => {
       if (rsp.success) {
         try {
-          await addDoc(collection(db, "payments"), {
-            imp_uid: rsp.imp_uid,
-            merchant_uid: rsp.merchant_uid,
-            amount: rsp.paid_amount,
-            buyer_email: rsp.buyer_email,
-            buyer_name: rsp.buyer_name,
-            status: "paid",
-            paid_at: new Date(),
+          const res = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: 1,
+              product_ids: products.map((p) => p.product_id),
+              reservation_date: new Date().toISOString().split("T")[0],
+              reservation_time: new Date()
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8),
+              customer_name: buyer.customer_name,
+              contact_phone: buyer.contact_phone,
+              contact_email: buyer.contact_email,
+              address: buyer.address,
+              status: "pending",
+              payment_method: "card",
+              total_price: totalPrice,
+            }),
           });
-          alert("결제 성공!");
+
+          if (!res.ok) throw new Error("주문 저장 실패");
+          alert("결제 성공 및 주문 저장 완료!");
         } catch (err) {
-          console.log("결제는 성공했지만 저장에 실패했습니다.");
+          console.error(err);
+          alert("결제는 성공했지만 주문 저장에 실패했습니다.");
         }
       } else {
-        alert(`${rsp.error_msg}`);
+        alert(`결제 실패: ${rsp.error_msg}`);
       }
     });
   };
