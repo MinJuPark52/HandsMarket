@@ -1,26 +1,22 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { db } from "../../firebase/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { IoSearchSharp } from "react-icons/io5";
 import { MdErrorOutline } from "react-icons/md";
 
 interface Product {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
+  product_id: number;
+  product_name: string;
   price: number;
+  image?: string;
+  description?: string;
 }
 
-const fetchProducts = async (): Promise<Product[]> => {
-  const querySnapshot = await getDocs(collection(db, "product"));
-  return querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Product[];
+const fetchProducts = async (keyword: string): Promise<Product[]> => {
+  const res = await fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`);
+  if (!res.ok) throw new Error("검색 API 호출 실패");
+  return res.json();
 };
 
 const useQueryParams = () => {
@@ -31,8 +27,7 @@ const SearchResults = () => {
   const queryParams = useQueryParams();
   const navigate = useNavigate();
 
-  const initialSearchTerm =
-    queryParams.get("query")?.toLowerCase().trim() || "";
+  const initialSearchTerm = queryParams.get("query")?.trim() || "";
   const initialSort = queryParams.get("sort") || "default";
 
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -43,8 +38,9 @@ const SearchResults = () => {
     isLoading,
     error,
   } = useQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: ["products", searchTerm],
+    queryFn: () => fetchProducts(searchTerm),
+    enabled: !!searchTerm,
   });
 
   const handleSearch = () => {
@@ -54,36 +50,18 @@ const SearchResults = () => {
     navigate(`/searchresult?${params.toString()}`);
   };
 
-  const sortProducts = (items: Product[], method: string) => {
-    switch (method) {
-      case "price-asc":
-        return [...items].sort((a, b) => a.price - b.price);
-      case "price-desc":
-        return [...items].sort((a, b) => b.price - a.price);
-      default:
-        return items;
-    }
-  };
-
-  const filteredProducts = useMemo(() => {
+  const sortedProducts = useMemo(() => {
     if (!products) return [];
 
-    if (!searchTerm) return sortProducts(products, sortMethod);
-
-    const searchWords = searchTerm.toLowerCase().split(/\s+/);
-
-    const filtered = products.filter((product) => {
-      const title = product.title.toLowerCase();
-      return searchWords.every((word) => title.includes(word));
-    });
-
-    return sortProducts(filtered, sortMethod);
-  }, [products, searchTerm, sortMethod]);
-
-  useEffect(() => {
-    setSearchTerm(initialSearchTerm);
-    setSortMethod(initialSort);
-  }, [initialSearchTerm, initialSort]);
+    switch (sortMethod) {
+      case "price-asc":
+        return [...products].sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return [...products].sort((a, b) => b.price - a.price);
+      default:
+        return products;
+    }
+  }, [products, sortMethod]);
 
   if (isLoading)
     return (
@@ -123,7 +101,7 @@ const SearchResults = () => {
       <div className="flex items-center justify-between mr-4 py-2">
         {products && (
           <p className="text-gray-700 font-medium">
-            "{searchTerm}" 검색 결과 {filteredProducts.length}건
+            "{searchTerm}" 검색 결과 {sortedProducts.length}건
           </p>
         )}
 
@@ -149,18 +127,18 @@ const SearchResults = () => {
       </div>
 
       {/* 결과 리스트 */}
-      {filteredProducts.length === 0 ? (
-        ``
+      {sortedProducts.length === 0 ? (
+        <p className="text-gray-500 mt-4">검색 결과가 없습니다.</p>
       ) : (
         <div className="grid grid-cols-4 gap-4">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="rounded-lg p-2 shadow">
+          {sortedProducts.map((product) => (
+            <div key={product.product_id} className="rounded-lg p-2 shadow">
               <img
                 src={product.image}
-                alt={product.title}
+                alt={product.product_name}
                 className="h-[150px] w-full object-cover mb-2"
               />
-              <p className="text-lg font-medium">{product.title}</p>
+              <p className="text-lg font-medium">{product.product_name}</p>
               <p>{product.price.toLocaleString("ko-KR")}원</p>
             </div>
           ))}

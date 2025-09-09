@@ -14,6 +14,7 @@ const tagsRouter = require("./routes/tags");
 const productsRouter = require("./routes/products");
 const productImagesRouter = require("./routes/productImages");
 const recommendRouter = require("./routes/recommend");
+const searchRouter = require("./routes/search");
 
 const mysql = require("mysql2/promise");
 const app = express();
@@ -57,6 +58,15 @@ app.use("/api/tags", tagsRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/productImages", productImagesRouter);
 app.use("/api/recommend", recommendRouter);
+app.use("/api/search", searchRouter);
+
+// React SPA 빌드 정적 파일 서빙
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+// SPA catch-all
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+});
 
 // 404
 app.use(function (req, res, next) {

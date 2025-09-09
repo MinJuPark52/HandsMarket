@@ -1,21 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
-import { useQuery } from "@tanstack/react-query";
-import { db } from "../../firebase/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
 
 interface Product {
-  id: string;
-  title: string;
+  product_id: number;
+  product_name: string;
 }
-
-const fetchProductTitles = async (): Promise<Product[]> => {
-  const snapshot = await getDocs(collection(db, "product"));
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    title: doc.data().title,
-  }));
-};
 
 interface SearchPageModalProps {
   onClose: () => void;
@@ -23,27 +12,28 @@ interface SearchPageModalProps {
 
 const SearchPageModal: React.FC<SearchPageModalProps> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredKeywords, setFilteredKeywords] = useState<string[]>([]);
-
-  const { data: products } = useQuery<Product[]>({
-    queryKey: ["productTitles"],
-    queryFn: fetchProductTitles,
-  });
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    if (!searchTerm || !products) {
-      setFilteredKeywords([]);
+    if (!searchTerm) {
+      setFilteredProducts([]);
       return;
     }
 
-    const matches = products
-      .map((product) => product.title)
-      .filter((title) =>
-        title.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(
+          `/api/search?keyword=${encodeURIComponent(searchTerm)}`
+        );
+        const data: Product[] = await response.json();
+        setFilteredProducts(data.slice(0, 5));
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
+      }
+    };
 
-    setFilteredKeywords(matches.slice(0, 5));
-  }, [searchTerm, products]);
+    fetchProducts();
+  }, [searchTerm]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -88,16 +78,16 @@ const SearchPageModal: React.FC<SearchPageModalProps> = ({ onClose }) => {
         </div>
 
         {/* 자동완성 검색 결과 */}
-        {filteredKeywords.length > 0 && (
+        {filteredProducts.length > 0 && (
           <ul className="max-h-8font-semibold text-lg px-2 bg-white rounded shadow">
-            {filteredKeywords.map((keyword, index) => (
+            {filteredProducts.map((product) => (
               <li
-                key={index}
+                key={product.product_id}
                 className="px-4 py-4 flex items-center border-b border-gray-100 cursor-pointer hover:bg-gray-50 dark:text-gray-600"
-                onClick={() => handleSearchSelect(keyword)}
+                onClick={() => handleSearchSelect(product.product_name)}
               >
                 <FiSearch className="mr-2 text-gray-600 text-xl" />
-                {keyword}
+                {product.product_name}
               </li>
             ))}
           </ul>
