@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Footer from "./components/home/Footer";
 import Products from "./components/home/Products";
 import Slide from "./components/home/Slide";
@@ -11,7 +12,11 @@ const categories = [
 ];
 
 const App = () => {
-  const handleSelect = (category: { id: number; name: string }) => {};
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
+
+  const handleSelect = (category: { id: number; name: string }) => {
+    setSelectedCategoryId(category.id);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-800 text-black dark:text-white">
@@ -22,7 +27,7 @@ const App = () => {
         <Slide />
       </div>
       <div className="mt-2">
-        <Products />
+        <Products categoryId={selectedCategoryId} />
       </div>
       <Footer />
     </div>

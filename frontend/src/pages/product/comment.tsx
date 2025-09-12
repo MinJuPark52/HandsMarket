@@ -1,16 +1,4 @@
 import { useState, useEffect } from "react";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  orderBy,
-  serverTimestamp,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BeatLoader } from "react-spinners";
 

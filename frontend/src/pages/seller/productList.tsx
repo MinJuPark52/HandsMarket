@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { db } from "../../firebase/firebaseConfig";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
 import { FiMoreVertical } from "react-icons/fi";

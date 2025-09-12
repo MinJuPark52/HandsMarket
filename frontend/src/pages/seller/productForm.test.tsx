@@ -3,9 +3,6 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductForm from "./productForm";
 
-import * as firestore from "firebase/firestore";
-import * as storage from "firebase/storage";
-
 jest.mock("firebase/firestore");
 jest.mock("firebase/storage");
 

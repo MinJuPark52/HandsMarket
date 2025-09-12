@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getAuth, updateProfile, updatePassword } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 
 const profileSchema = z
@@ -31,7 +27,6 @@ const profileSchema = z
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 const EditProfilePage: React.FC = () => {
-  const auth = getAuth();
   const user = auth.currentUser;
   const navigate = useNavigate();
 

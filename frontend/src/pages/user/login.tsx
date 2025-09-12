@@ -45,7 +45,7 @@ const LoginPage: React.FC = () => {
       const { token, user } = response.data;
 
       setLogin(
-        user.id,
+        user.user_id,
         user.email,
         user.nickname,
         user.profileImage,

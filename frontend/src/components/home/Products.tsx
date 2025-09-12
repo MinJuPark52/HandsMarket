@@ -11,8 +11,15 @@ interface Product {
   thumbnailUrl?: string;
 }
 
-const fetchProducts = async (): Promise<Product[]> => {
-  const { data } = await axios.get("/api/products");
+interface Props {
+  categoryId?: number;
+}
+
+const fetchProducts = async (categoryId?: number): Promise<Product[]> => {
+  const url = categoryId
+    ? `/api/products?category_id=${categoryId}`
+    : "/api/products";
+  const { data } = await axios.get(url);
 
   const productsWithImages = await Promise.all(
     data.map(async (product: Product) => {
@@ -28,14 +35,14 @@ const fetchProducts = async (): Promise<Product[]> => {
   return productsWithImages;
 };
 
-const Products = () => {
+const Products: React.FC<Props> = ({ categoryId }) => {
   const {
     data: productList,
     isLoading,
     error,
   } = useQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: ["products", categoryId],
+    queryFn: () => fetchProducts(categoryId),
   });
 
   if (isLoading)
