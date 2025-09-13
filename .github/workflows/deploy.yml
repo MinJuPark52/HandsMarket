@@ -9,6 +9,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ubuntu
+      SERVER_KEY: ${{ secrets.SERVER_KEY }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -24,19 +29,16 @@ jobs:
           npm run build
 
       - name: Deploy frontend
-        env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
           echo "$SERVER_KEY" > private_key
           chmod 600 private_key
 
           ssh -i private_key $SERVER_USER@$SERVER_HOST "
-            cd /path/to/frontend &&
+            cd ~/HandsMarket/frontend &&
             git pull &&
             npm install &&
-            pm2 restart frontend-app || pm2 start frontend-app --name frontend-app -- node server.js
+            npm run build &&
+            pm2 restart frontend-app || pm2 start frontend-app --name frontend-app -- serve -s build -l 3000
           "
 
           rm private_key
@@ -48,16 +50,12 @@ jobs:
           npm install
 
       - name: Deploy backend
-        env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_KEY: ${{ secrets.SERVER_KEY }}
         run: |
           echo "$SERVER_KEY" > private_key
           chmod 600 private_key
 
           ssh -i private_key $SERVER_USER@$SERVER_HOST "
-            cd /path/to/backend &&
+            cd ~/HandsMarket/backend &&
             git pull &&
             npm install &&
             pm2 restart backend-app || pm2 start backend-app --name backend-app -- node ./bin/www
