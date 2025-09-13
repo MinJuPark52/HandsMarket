@@ -19,6 +19,8 @@ const fetchProducts = async (categoryId?: number): Promise<Product[]> => {
   const url = categoryId
     ? `/api/products?category_id=${categoryId}`
     : "/api/products";
+  console.log("API 호출 URL:", url);
+
   const { data } = await axios.get(url);
 
   const productsWithImages = await Promise.all(

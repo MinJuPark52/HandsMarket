@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from "react";
-
 interface Category {
   id: number;
   name: string;
@@ -7,29 +5,23 @@ interface Category {
 
 interface Props {
   categories: Category[];
+  selectedCategoryId: number;
   onSelect?: (category: Category) => void;
 }
 
-const CategoryList: React.FC<Props> = ({ categories, onSelect }) => {
-  const [selectedId, setSelectedId] = useState<number | null>(
-    categories.length > 0 ? categories[0].id : null
-  );
-
-  useEffect(() => {
-    if (categories.length > 0 && onSelect) {
-      onSelect(categories[0]);
-    }
-  }, [categories, onSelect]);
-
+const CategoryList: React.FC<Props> = ({
+  categories,
+  selectedCategoryId,
+  onSelect,
+}) => {
   const handleClick = (category: Category) => {
-    setSelectedId(category.id);
     onSelect?.(category);
   };
 
   return (
     <div className="max-w-[768px] mx-auto flex justify-between">
       {categories.map((category) => {
-        const isSelected = category.id === selectedId;
+        const isSelected = category.id === selectedCategoryId;
         return (
           <button
             key={category.id}
