@@ -7,8 +7,45 @@ const {
 
 async function getCategories(req, res, next) {
   try {
+    const { category_id, best, home } = req.query;
     const categories = await getAllCategories(req.pool);
-    res.json(categories);
+
+    if (best) {
+      const [bestProducts] = await req.pool.query(
+        "SELECT * FROM products ORDER BY view_count DESC LIMIT 10"
+      );
+      return res.json(bestProducts);
+    }
+
+    if (home) {
+      const [homeProducts] = await req.pool.query(
+        "SELECT * FROM products WHERE is_recommended = 1 LIMIT 10"
+      );
+      return res.json(homeProducts);
+    }
+
+    if (category_id) {
+      const [products] = await req.pool.query(
+        "SELECT * FROM products WHERE category_id = ?",
+        [category_id]
+      );
+      return res.json(products);
+    }
+
+    const categoriesWithProducts = [];
+
+    for (const category of categories) {
+      const [products] = await req.pool.query(
+        "SELECT * FROM products WHERE category_id = ?",
+        [category.id]
+      );
+      categoriesWithProducts.push({
+        category: category,
+        products: products,
+      });
+    }
+
+    res.json(categoriesWithProducts);
   } catch (error) {
     next(error);
   }

@@ -13,12 +13,27 @@ interface Product {
 
 interface Props {
   categoryId?: number;
+  home: boolean;
+  best: boolean;
 }
 
-const fetchProducts = async (categoryId?: number): Promise<Product[]> => {
-  const url = categoryId
+const fetchProducts = async (
+  categoryId?: number,
+  home: boolean = false,
+  best: boolean = false
+): Promise<Product[]> => {
+  let url = categoryId
     ? `/api/products?category_id=${categoryId}`
     : "/api/products";
+
+  if (home) {
+    url += "&home=true";
+  }
+
+  if (best) {
+    url += "&best=true";
+  }
+
   console.log("API 호출 URL:", url);
 
   const { data } = await axios.get(url);
@@ -37,14 +52,14 @@ const fetchProducts = async (categoryId?: number): Promise<Product[]> => {
   return productsWithImages;
 };
 
-const Products: React.FC<Props> = ({ categoryId }) => {
+const Products: React.FC<Props> = ({ categoryId, home, best }) => {
   const {
     data: productList,
     isLoading,
     error,
   } = useQuery<Product[]>({
-    queryKey: ["products", categoryId],
-    queryFn: () => fetchProducts(categoryId),
+    queryKey: ["products", categoryId, home, best],
+    queryFn: () => fetchProducts(categoryId, home, best),
   });
 
   if (isLoading)

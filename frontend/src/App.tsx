@@ -4,19 +4,38 @@ import Products from "./components/home/Products";
 import Slide from "./components/home/Slide";
 import HomeCategory from "./components/home/HomeCategory";
 
+interface Category {
+  id?: number;
+  name: string;
+}
+
 const categories = [
-  { id: 4, name: "홈" },
-  { id: 3, name: "베스트" },
+  { name: "홈" },
+  { name: "베스트" },
   { id: 2, name: "지역 상품" },
   { id: 1, name: "핸드메이드" },
 ];
 
 const App = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(4);
+  const [homeFilter, setHomeFilter] = useState<boolean>(false);
+  const [bestFilter, setBestFilter] = useState<boolean>(false);
 
-  const handleSelect = (category: { id: number; name: string }) => {
+  const handleSelect = (category: Category) => {
     console.log("선택된 카테고리 id:", category.id);
-    setSelectedCategoryId(category.id);
+    const categoryId = category.id ?? 0;
+    setSelectedCategoryId(categoryId);
+
+    if (category.name === "홈") {
+      setHomeFilter(true);
+      setBestFilter(false);
+    } else if (category.name === "베스트") {
+      setHomeFilter(false);
+      setBestFilter(true);
+    } else {
+      setHomeFilter(false);
+      setBestFilter(false);
+    }
   };
 
   return (

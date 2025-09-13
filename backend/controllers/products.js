@@ -8,11 +8,9 @@ const {
 
 async function getAllProducts(req, res, next) {
   try {
-    const { seller_id, category_id } = req.query;
-    const products = await findAllProducts(req.pool, {
-      seller_id,
-      category_id,
-    });
+    const { seller_id, category_id, home, best } = req.query;
+    const filter = { seller_id, category_id, home, best };
+    const products = await findAllProducts(req.pool, filter);
     res.json(products);
   } catch (error) {
     next(error);
@@ -33,7 +31,8 @@ async function getProductById(req, res, next) {
 async function createProduct(req, res, next) {
   try {
     const seller_id = req.user.user_id;
-    const { product_name, price, category_id, options } = req.body;
+    const { product_name, price, category_id, options, is_recommended } =
+      req.body;
 
     if (!product_name || !price) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -45,6 +44,7 @@ async function createProduct(req, res, next) {
       product_name,
       price,
       options,
+      is_recommended,
     });
 
     res
@@ -58,13 +58,15 @@ async function createProduct(req, res, next) {
 async function updateProduct(req, res, next) {
   try {
     const { product_id } = req.params;
-    const { product_name, price, category_id, options } = req.body;
+    const { product_name, price, category_id, options, is_recommended } =
+      req.body;
 
     const updated = await modifyProduct(req.pool, product_id, {
       product_name,
       price,
       category_id,
       options,
+      is_recommended,
     });
 
     if (!updated) {

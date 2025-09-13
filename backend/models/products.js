@@ -1,5 +1,5 @@
 // 전체 상품 조회 (옵션 필터링 포함)
-async function findAllProducts(pool, { seller_id, category_id }) {
+async function findAllProducts(pool, { seller_id, category_id, home, best }) {
   let query = "SELECT * FROM products WHERE 1=1";
   const params = [];
 
@@ -11,6 +11,15 @@ async function findAllProducts(pool, { seller_id, category_id }) {
   if (category_id) {
     query += " AND category_id = ?";
     params.push(category_id);
+  }
+
+  if (home) {
+    query += " AND is_recommended = ?";
+    params.push(true);
+  }
+
+  if (best) {
+    query += " ORDER BY view_count DESC";
   }
 
   const [rows] = await pool.query(query, params);
