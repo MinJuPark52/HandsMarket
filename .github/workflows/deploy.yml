@@ -33,7 +33,7 @@ jobs:
           echo "$SERVER_KEY" > private_key
           chmod 600 private_key
 
-          ssh -i private_key $SERVER_USER@$SERVER_HOST "
+          ssh -o StrictHostKeyChecking=no -i private_key $SERVER_USER@$SERVER_HOST "
             cd ~/HandsMarket/frontend &&
             git pull &&
             npm install &&
@@ -54,7 +54,7 @@ jobs:
           echo "$SERVER_KEY" > private_key
           chmod 600 private_key
 
-          ssh -i private_key $SERVER_USER@$SERVER_HOST "
+          ssh -o StrictHostKeyChecking=no -i private_key $SERVER_USER@$SERVER_HOST "
             cd ~/HandsMarket/backend &&
             git pull &&
             npm install &&
