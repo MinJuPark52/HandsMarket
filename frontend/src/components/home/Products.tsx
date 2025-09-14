@@ -34,8 +34,6 @@ const fetchProducts = async (
     url += "&best=true";
   }
 
-  console.log("API 호출 URL:", url);
-
   const { data } = await axios.get(url);
 
   const productsWithImages = await Promise.all(

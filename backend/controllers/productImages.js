@@ -5,6 +5,7 @@ const {
   getImagesByProductId,
   deleteImageById,
 } = require("../models/productImages");
+const { uploadToS3, deleteFromS3 } = require("../Images/S3");
 
 async function uploadImage(req, res, next) {
   try {
@@ -20,11 +21,25 @@ async function uploadImage(req, res, next) {
     if (!thumbnailFile || !imageFile)
       return res.status(400).json({ message: "Image files are required" });
 
+    const thumbnailS3Url = await uploadToS3(
+      thumbnailFile.path,
+      `product-images/thumbnails/${thumbnailFile.filename}`,
+      thumbnailFile.mimetype
+    );
+    const imageS3Url = await uploadToS3(
+      imageFile.path,
+      `product-images/images/${imageFile.filename}`,
+      imageFile.mimetype
+    );
+
+    fs.unlinkSync(thumbnailFile.path);
+    fs.unlinkSync(imageFile.path);
+
     const image_id = await insertImage(
       pool,
       product_id,
-      thumbnailFile.filename,
-      imageFile.filename
+      thumbnailS3Url,
+      imageS3Url
     );
 
     res.status(201).json({ message: "Image uploaded", image_id });
@@ -46,6 +61,10 @@ async function getImages(req, res, next) {
   }
 }
 
+function getKeyFromUrl(url) {
+  return url.split(".amazonaws.com/")[1];
+}
+
 async function deleteImage(req, res, next) {
   try {
     const pool = req.pool;
@@ -58,6 +77,11 @@ async function deleteImage(req, res, next) {
         const filePath = path.join(__dirname, "../uploads", file);
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       });
+      const thumbnailKey = getKeyFromUrl(fileInfo.thumbnail);
+      const imageKey = getKeyFromUrl(fileInfo.image);
+
+      await deleteFromS3(thumbnailKey);
+      await deleteFromS3(imageKey);
     }
 
     res.json({ message: "Image deleted" });

@@ -1,3 +1,5 @@
+const fs = require("fs");
+const { uploadToS3 } = require("../Images/S3");
 const {
   createSeller: createSellerModel,
   findSellerById,
@@ -9,14 +11,23 @@ const {
 async function createSeller(req, res, next) {
   try {
     const { seller_name } = req.body;
-    const profileImage = req.file?.filename || null;
     const user_id = req.user.user_id;
+
+    let profileImageUrl = null;
+    if (req.file) {
+      profileImageUrl = await uploadToS3(
+        req.file.path,
+        `seller-profile-images/${req.file.filename}`,
+        req.file.mimetype
+      );
+      fs.unlinkSync(req.file.path);
+    }
 
     const seller = await createSellerModel(
       req.pool,
       user_id,
       seller_name,
-      profileImage
+      profileImageUrl
     );
 
     res.status(201).json({ message: "판매자 등록 성공", seller });
@@ -44,11 +55,19 @@ async function updateSeller(req, res, next) {
   try {
     const id = parseInt(req.params.id);
     const { seller_name } = req.body;
-    const profileImage = req.file?.filename || null;
 
     const updates = {};
     if (seller_name) updates.seller_name = seller_name;
-    if (profileImage) updates.profile_image = profileImage;
+
+    if (req.file) {
+      const profileImageUrl = await uploadToS3(
+        req.file.path,
+        `seller-profile-images/${req.file.filename}`,
+        req.file.mimetype
+      );
+      fs.unlinkSync(req.file.path);
+      updates.profile_image = profileImageUrl;
+    }
 
     const updatedSeller = await updateSellerModel(req.pool, id, updates);
 

@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { uploadToS3 } = require("../Images/S3");
 const SECRET_KEY = process.env.JWT_SECRET;
 
 const {
@@ -94,7 +95,6 @@ async function myProfile(req, res, next) {
 async function updateUser(req, res, next) {
   const { user_id } = req.params;
   const { name, email, password } = req.body;
-  const profileImage = req.file?.filename;
 
   try {
     const user = await findUserById(req.pool, user_id);
@@ -130,9 +130,18 @@ async function updateUser(req, res, next) {
       fields.push("password_hash = ?");
       values.push(hashedPassword);
     }
-    if (profileImage) {
+
+    if (req.file) {
+      const localPath = req.file.path;
+      const s3Key = `profile-images/${req.file.filename}`;
+      const contentType = req.file.mimetype;
+
+      const s3Url = await uploadToS3(localPath, s3Key, contentType);
+
+      fs.unlinkSync(localPath);
+
       fields.push("profile_image = ?");
-      values.push(profileImage);
+      values.push(s3Url);
     }
 
     if (fields.length === 0) {
