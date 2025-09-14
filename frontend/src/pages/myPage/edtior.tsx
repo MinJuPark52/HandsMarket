@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const profileSchema = z
   .object({
-    nickname: z.string().min(1, "닉네임을 입력해주세요"),
+    name: z.string().min(1, "닉네임을 입력해주세요"),
     password: z
       .string()
       .min(6, "비밀번호는 최소 6자리 이상이어야 합니다")
@@ -27,8 +28,10 @@ const profileSchema = z
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 const EditProfilePage: React.FC = () => {
-  const user = auth.currentUser;
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
     register,
@@ -39,15 +42,23 @@ const EditProfilePage: React.FC = () => {
     resolver: zodResolver(profileSchema),
   });
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   useEffect(() => {
-    if (user) {
-      setValue("nickname", user.displayName || "");
-      setPreviewUrl(user.photoURL || null);
-    }
-  }, [user, setValue]);
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get("/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setUser(response.data);
+        setValue("name", response.data.name || "");
+        setPreviewUrl(response.data.profile_image || null);
+      } catch (error) {
+        console.error("사용자 정보 가져오기 오류:", error);
+      }
+    };
+    fetchUser();
+  }, [setValue]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -61,32 +72,25 @@ const EditProfilePage: React.FC = () => {
     if (!user) return;
 
     try {
-      let photoURL = user.photoURL;
+      const formData = new FormData();
+      formData.append("name", data.name);
+      if (data.password) formData.append("password", data.password);
+      if (imageFile) formData.append("profileImage", imageFile);
 
-      if (imageFile) {
-        const imageRef = ref(storage, `profile_images/${user.uid}`);
-        await uploadBytes(imageRef, imageFile);
-        photoURL = await getDownloadURL(imageRef);
-      }
-
-      await updateProfile(user, {
-        displayName: data.nickname,
-        photoURL,
+      const res = await axios.patch(`/api/users/${user.user_id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
 
-      if (data.password && data.password.length >= 6) {
-        await updatePassword(user, data.password);
+      if (res.status === 200) {
+        alert("프로필이 성공적으로 수정되었습니다.");
+        navigate("/");
       }
-
-      await updateDoc(doc(db, "users", user.uid), {
-        nickname: data.nickname,
-        profileImage: photoURL,
-      });
-
-      alert("프로필이 성공적으로 수정되었습니다.");
-      navigate("/");
     } catch (error: any) {
       console.error("프로필 수정 오류:", error.message);
+      alert("프로필 수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -129,10 +133,10 @@ const EditProfilePage: React.FC = () => {
             className="w-[600px] h-[50px] p-2 my-2 border border-gray-300 rounded-md focus:outline-none"
             placeholder="닉네임"
             type="text"
-            {...register("nickname")}
+            {...register("name")}
           />
-          {errors.nickname && (
-            <p className="text-red-500 text-sm">{errors.nickname.message}</p>
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
         </div>
 

@@ -23,7 +23,7 @@ const signupSchema = z
         "비밀번호는 소문자, 숫자, 특수문자를 포함해야 합니다"
       ),
     passwordAgain: z.string().min(1, "비밀번호 재입력을 입력해주세요"),
-    nickname: z.string().min(1, "닉네임을 입력해주세요"),
+    name: z.string().min(1, "닉네임을 입력해주세요"),
   })
   .refine((data) => data.password === data.passwordAgain, {
     message: "비밀번호가 일치하지 않습니다",
@@ -55,7 +55,7 @@ const SignupPage: React.FC = () => {
       await axios.post("/api/users/signup", {
         email: fullEmail,
         password: data.password,
-        name: data.nickname,
+        name: data.name,
         role: role,
       });
 
@@ -162,10 +162,10 @@ const SignupPage: React.FC = () => {
             className="w-[600px] p-2 my-2 border border-gray-300 rounded-md text-base focus:border-gray-500 focus:outline-none"
             placeholder="닉네임"
             type="text"
-            {...register("nickname")}
+            {...register("name")}
           />
-          {errors.nickname && (
-            <p className="text-red-500 text-sm">{errors.nickname.message}</p>
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
         </div>
 

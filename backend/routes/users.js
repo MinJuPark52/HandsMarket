@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authToken = require("../middlewares/auth");
-
+const upload = require("../middlewares/upload");
 const {
   login,
   signup,
@@ -15,6 +15,6 @@ router.post("/signup", validateSignup, signup);
 router.post("/login", validateLogin, login);
 router.get("/me", authToken, myProfile);
 router.get("/:user_id", authToken, userProfile);
-router.patch("/:user_id", authToken, updateUser);
+router.patch("/:user_id", authToken, upload.single("profileImage"), updateUser);
 
 module.exports = router;

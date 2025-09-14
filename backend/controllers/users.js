@@ -94,6 +94,7 @@ async function myProfile(req, res, next) {
 async function updateUser(req, res, next) {
   const { user_id } = req.params;
   const { name, email, password } = req.body;
+  const profileImage = req.file?.filename;
 
   try {
     const user = await findUserById(req.pool, user_id);
@@ -101,7 +102,7 @@ async function updateUser(req, res, next) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (email) {
+    if (email && email !== user.email) {
       const existingUser = await findUserByEmail(req.pool, email);
       if (existingUser && existingUser.user_id != user_id) {
         return res.status(409).json({ message: "Email already exists" });
@@ -128,6 +129,10 @@ async function updateUser(req, res, next) {
     if (hashedPassword) {
       fields.push("password_hash = ?");
       values.push(hashedPassword);
+    }
+    if (profileImage) {
+      fields.push("profile_image = ?");
+      values.push(profileImage);
     }
 
     if (fields.length === 0) {

@@ -4,7 +4,7 @@ interface SignupState {
   id: string;
   password: string;
   passwordAgain: string;
-  nickname: string;
+  name: string;
   emailDomain: "@gmail.com" | "@naver.com" | "@outlook.com" | "@daum.com";
   userType: "user" | "seller";
   error: string;
@@ -24,7 +24,7 @@ const useSignupStore = create<SignupState>((set) => ({
   id: "",
   password: "",
   passwordAgain: "",
-  nickname: "",
+  name: "",
   emailDomain: "@gmail.com",
   userType: "user",
   error: "",
