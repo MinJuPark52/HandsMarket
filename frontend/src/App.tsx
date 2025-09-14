@@ -17,12 +17,11 @@ const categories = [
 ];
 
 const App = () => {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(4);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(0);
   const [homeFilter, setHomeFilter] = useState<boolean>(false);
   const [bestFilter, setBestFilter] = useState<boolean>(false);
 
   const handleSelect = (category: Category) => {
-    console.log("선택된 카테고리 id:", category.id);
     const categoryId = category.id ?? 0;
     setSelectedCategoryId(categoryId);
 
@@ -51,7 +50,11 @@ const App = () => {
         <Slide />
       </div>
       <div className="mt-2">
-        <Products categoryId={selectedCategoryId} />
+        <Products
+          categoryId={selectedCategoryId}
+          home={homeFilter}
+          best={bestFilter}
+        />
       </div>
       <Footer />
     </div>
