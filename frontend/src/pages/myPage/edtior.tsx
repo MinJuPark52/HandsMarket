@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import fetchApi from "../../api";
 
 const profileSchema = z
   .object({
@@ -45,7 +45,7 @@ const EditProfilePage: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get("/api/users/me", {
+        const response = await fetchApi.get("/api/users/me", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -77,7 +77,7 @@ const EditProfilePage: React.FC = () => {
       if (data.password) formData.append("password", data.password);
       if (imageFile) formData.append("profileImage", imageFile);
 
-      const res = await axios.patch(`/api/users/${user.user_id}`, formData, {
+      const res = await fetchApi.patch(`/api/users/${user.user_id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,

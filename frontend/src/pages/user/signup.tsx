@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import fetchApi from "../../api";
 
 const signupSchema = z
   .object({
@@ -52,7 +52,7 @@ const SignupPage: React.FC = () => {
     const role = userType === "buyer" ? "user" : "seller";
 
     try {
-      await axios.post("/api/users/signup", {
+      await fetchApi.post("/api/users/signup", {
         email: fullEmail,
         password: data.password,
         name: data.name,

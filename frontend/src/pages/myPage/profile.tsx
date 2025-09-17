@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import useLoginStore from "../../stores/useLoginStore";
 import { BeatLoader } from "react-spinners";
 import { GoChevronRight } from "react-icons/go";
-import axios from "axios";
+import fetchApi from "../../api";
 
 const Profile = () => {
   const { email, name, profile_image, isLoggedIn, logout, role, setLogin } =
@@ -20,7 +20,7 @@ const Profile = () => {
           return;
         }
 
-        const response = await axios.get("/api/users/me", {
+        const response = await fetchApi.get("/api/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

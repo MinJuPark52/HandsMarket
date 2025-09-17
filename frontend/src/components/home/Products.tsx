@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { BeatLoader } from "react-spinners";
 import { MdErrorOutline } from "react-icons/md";
-import axios from "axios";
+import fetchApi from "../../api";
 
 interface Product {
   product_id: string;
@@ -34,12 +34,14 @@ const fetchProducts = async (
     url += "&best=true";
   }
 
-  const { data } = await axios.get(url);
+  const { data } = await fetchApi.get(url);
 
   const productsWithImages = await Promise.all(
     data.map(async (product: Product) => {
       try {
-        const res = await axios.get(`/api/productImages/${product.product_id}`);
+        const res = await fetchApi.get(
+          `/api/productImages/${product.product_id}`
+        );
         return { ...product, thumbnailUrl: res.data[0]?.url || "" };
       } catch {
         return { ...product, thumbnailUrl: "" };

@@ -7,7 +7,7 @@ import { GoX } from "react-icons/go";
 import Category from "./productCategory";
 import { BeatLoader } from "react-spinners";
 import useLoginStore from "../../stores/useLoginStore";
-import axios from "axios";
+import fetchApi from "../../api";
 
 interface ProductOptionValue {
   label: string;
@@ -38,8 +38,8 @@ interface SelectedCombo {
 }
 
 const fetchProductById = async (id: string): Promise<Product> => {
-  const { data: product } = await axios.get(`/api/products/${id}`);
-  const { data: images } = await axios.get(`/api/productImages/${id}`);
+  const { data: product } = await fetchApi.get(`/api/products/${id}`);
+  const { data: images } = await fetchApi.get(`/api/productImages/${id}`);
   return {
     ...product,
     images: images.map((img: any) => img.image),

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import fetchApi from "../../api";
 
 interface ProductFormProps {
   id?: string;
@@ -21,7 +21,7 @@ const RegistSeller = ({ id }: ProductFormProps) => {
     const fetchSeller = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`/api/sellers/${id}`, {
+        const res = await fetchApi.get(`/api/sellers/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -61,7 +61,7 @@ const RegistSeller = ({ id }: ProductFormProps) => {
 
       const token = localStorage.getItem("token");
 
-      const res = await axios({
+      const res = await fetchApi({
         method: isEdit ? "patch" : "post",
         url,
         data: formData,
@@ -77,8 +77,8 @@ const RegistSeller = ({ id }: ProductFormProps) => {
       );
       navigate("/");
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "서버 오류");
+      if (error instanceof Error) {
+        alert(error.message || "알 수 없는 오류가 발생했습니다.");
       } else {
         alert("알 수 없는 오류가 발생했습니다.");
       }

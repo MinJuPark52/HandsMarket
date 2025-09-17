@@ -5,6 +5,7 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const corsMiddleware = require("./middlewares/cors");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -17,33 +18,45 @@ const recommendRouter = require("./routes/recommend");
 const searchRouter = require("./routes/search");
 const ordersRouter = require("./routes/orders");
 
+const { testConnection } = require("./services/dbTest");
 const mysql = require("mysql2/promise");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // MySQL
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "parkminju00",
-  database: "handsmarket",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
+
+// MySQL 연결 테스트
+testConnection(pool)
+  .then(() => {
+    console.log("MySQL connection test passed.");
+  })
+  .catch((error) => {
+    console.error("MySQL connection test failed:", error);
+    process.exit(1);
+  });
 
 app.use((req, res, next) => {
   req.pool = pool;
   next();
 });
 
-app.listen(port, () => {
-  console.log(`http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+app.use(corsMiddleware);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

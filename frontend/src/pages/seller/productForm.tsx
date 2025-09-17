@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import fetchApi from "../../api";
 
 interface OptionValue {
   label: string;
@@ -58,7 +58,7 @@ const ProductForm = ({ product_id }: ProductFormProps) => {
       if (!product_id) return;
 
       try {
-        const { data } = await axios.get(`/api/products/${product_id}`);
+        const { data } = await fetchApi.get(`/api/products/${product_id}`);
         setProductName(data.product_name || "");
         setPrice(data.price || 0);
         setTags(data.tags || []);
@@ -78,7 +78,7 @@ const ProductForm = ({ product_id }: ProductFormProps) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get("/api/categories");
+        const { data } = await fetchApi.get("/api/categories");
         setCategories(data);
         if (data.length > 0) setSelectedCategory(data[0].id);
       } catch (err) {
@@ -88,7 +88,7 @@ const ProductForm = ({ product_id }: ProductFormProps) => {
 
     const fetchTags = async () => {
       try {
-        const { data } = await axios.get("/api/tags");
+        const { data } = await fetchApi.get("/api/tags");
         setAllTags(data);
       } catch (error) {
         console.error("태그 로딩 실패:", error);
@@ -190,7 +190,7 @@ const ProductForm = ({ product_id }: ProductFormProps) => {
       let savedProductId = product_id;
 
       if (!product_id) {
-        const res = await axios.post(
+        const res = await fetchApi.post(
           "/api/products",
           {
             product_name: productName,
@@ -207,7 +207,7 @@ const ProductForm = ({ product_id }: ProductFormProps) => {
         );
         savedProductId = res.data.product_id;
       } else {
-        await axios.put(
+        await fetchApi.put(
           `/api/products/${product_id}`,
           {
             product_name: productName,
@@ -230,7 +230,7 @@ const ProductForm = ({ product_id }: ProductFormProps) => {
         if (mainImage) formData.append("thumbnail", mainImage);
         if (detailImage) formData.append("image", detailImage);
 
-        await axios.post("/api/productImages", formData, {
+        await fetchApi.post("/api/productImages", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,

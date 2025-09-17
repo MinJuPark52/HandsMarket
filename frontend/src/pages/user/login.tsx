@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useLoginStore from "../../stores/useLoginStore";
-import axios from "axios";
+import fetchApi from "../../api";
 
 const loginSchema = z.object({
   id: z
@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post("/api/users/login", {
+      const response = await fetchApi.post("/api/users/login", {
         email: data.id,
         password: data.password,
       });
