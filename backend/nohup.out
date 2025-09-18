@@ -1,0 +1,16 @@
+
+> backend@0.0.0 start
+> node ./bin/www
+
+[dotenv@17.2.2] injecting env (8) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.2] injecting env (0) from .env -- tip: 📡 version env with Radar: https://dotenvx.com/radar
+Server running on port 8080
+MySQL connected successfully!
+MySQL connection test passed.
+[0mGET / [32m200 [0m14.957 ms - 398[0m
+[0mGET /static/css/main.4df7449c.css [32m200 [0m2.591 ms - 21424[0m
+[0mGET /static/js/main.2ad6a7a6.js [32m200 [0m6.175 ms - 514952[0m
+[0mGET /slide.png [32m200 [0m2.571 ms - 115215[0m
+[0mGET /favicon.ico [32m200 [0m1.622 ms - 398[0m
+[0mGET /api/products?category_id=4 [32m200 [0m48.899 ms - 2[0m
+[0mGET /api/products?category_id=4 [36m304 [0m2.700 ms - -[0m

@@ -7,7 +7,6 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const corsMiddleware = require("./middlewares/cors");
 
-const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const sellersRouter = require("./routes/sellers");
 const categoriesRouter = require("./routes/categories");
@@ -53,9 +52,6 @@ app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
 
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-
 app.use(corsMiddleware);
 app.use(logger("dev"));
 app.use(express.json());
@@ -64,7 +60,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use("/api/", indexRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/sellers", sellersRouter);
 app.use("/api/categories", categoriesRouter);
