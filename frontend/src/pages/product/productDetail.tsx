@@ -5,7 +5,7 @@ import { FiHeart } from "react-icons/fi";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { GoX } from "react-icons/go";
 import Category from "./productCategory";
-import { BeatLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 import useLoginStore from "../../stores/useLoginStore";
 import fetchApi from "../../api";
 
@@ -163,10 +163,10 @@ const ProductDetailPage = () => {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-20">
-        <span>Loading...</span>
-        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+        <ClipLoader color="#9CA3AF" size={26} />
       </div>
     );
+
   if (error || !product) return <p>Product not found or error occurred.</p>;
 
   return (

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useLoginStore from "../../stores/useLoginStore";
-import { BeatLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 import { GoChevronRight } from "react-icons/go";
 import fetchApi from "../../api";
 
@@ -54,7 +54,7 @@ const Profile = () => {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-20">
-        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+        <ClipLoader color="#9CA3AF" size={26} />
       </div>
     );
 
