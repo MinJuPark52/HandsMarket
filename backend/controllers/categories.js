@@ -40,7 +40,8 @@ async function getCategories(req, res, next) {
         [category.id]
       );
       categoriesWithProducts.push({
-        category: category,
+        id: category.category_id,
+        name: category.name,
         products: products,
       });
     }
