@@ -37,7 +37,7 @@ async function getCategories(req, res, next) {
     for (const category of categories) {
       const [products] = await req.pool.query(
         "SELECT * FROM products WHERE category_id = ?",
-        [category.category_id]
+        [category_id]
       );
       categoriesWithProducts.push({
         category: category,

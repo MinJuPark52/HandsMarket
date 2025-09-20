@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BeatLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 import { FiMoreVertical } from "react-icons/fi";
 
 interface Product {
@@ -72,7 +72,7 @@ const ProductList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+        <ClipLoader color="#9CA3AF" size={26} />
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { BeatLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 import { MdErrorOutline } from "react-icons/md";
 import fetchApi from "../../api";
 
@@ -65,20 +65,20 @@ const Products: React.FC<Props> = ({ categoryId, home, best }) => {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-20">
-        <BeatLoader color="#9CA3AF" size={13} margin={3} />
+        <ClipLoader color="#9CA3AF" size={26} />
       </div>
     );
 
   if (error)
     return (
-      <div className="flex justify-center items-center mt-20">
+      <div className="flex justify-center items-center mt-1">
         <MdErrorOutline color="#9CA3AF" size={24} />
         <span className="ml-2 text-gray-600">에러가 발생했습니다.</span>
       </div>
     );
 
   if (!productList || productList.length === 0)
-    return <p className="text-center text-lg">제품이 없습니다.</p>;
+    return <p className="text-center text-gray-600 mt-1">제품이 없습니다.</p>;
 
   return (
     <div className="flex justify-center">

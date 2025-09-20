@@ -24,11 +24,11 @@ const CategoryList: React.FC<Props> = ({
         const isSelected = category.id === selectedCategoryId;
         return (
           <button
-            key={category.id}
+            key={category.id || category.name}
             onClick={() => handleClick(category)}
             className={`
               flex flex-col items-center justify-center w-1/4
-              p-3 font-semibold text-center
+              p-2 text-center
               transition-colors 
               ${
                 isSelected
@@ -38,8 +38,9 @@ const CategoryList: React.FC<Props> = ({
               cursor-pointer
             `}
             type="button"
+            aria-pressed={isSelected}
           >
-            <span className="text-lg">{category.name}</span>
+            <span className="font-semibold text-sm">{category.name}</span>
           </button>
         );
       })}
