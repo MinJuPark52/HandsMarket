@@ -27,8 +27,9 @@ const fetchProducts = async (
 
   if (home) params.append("home", "1");
   if (best) params.append("best", "1");
-  if (!home && !best && categoryId)
+  if (!home && !best && categoryId !== null && categoryId !== undefined) {
     params.append("category_id", categoryId.toString());
+  }
 
   if ([...params].length > 0) url += `?${params.toString()}`;
 

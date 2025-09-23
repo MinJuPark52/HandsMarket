@@ -19,7 +19,7 @@ async function getCategories(req, res, next) {
 
     if (home) {
       const [homeProducts] = await req.pool.query(
-        "SELECT * FROM products WHERE is_recommended = 1 LIMIT 10"
+        "SELECT * FROM products ORDER BY created_at DESC LIMIT 10"
       );
       return res.json(homeProducts);
     }

@@ -14,12 +14,11 @@ async function findAllProducts(pool, { seller_id, category_id, home, best }) {
   }
 
   if (home) {
-    query += " AND is_recommended = ?";
-    params.push(true);
-  }
-
-  if (best) {
-    query += " ORDER BY view_count DESC";
+    query += " ORDER BY created_at DESC LIMIT 10";
+  } else if (best) {
+    query += " ORDER BY view_count DESC LIMIT 10";
+  } else {
+    query += " ORDER BY created_at DESC";
   }
 
   const [rows] = await pool.query(query, params);
@@ -41,7 +40,7 @@ async function insertProduct(
   { seller_id, category_id, product_name, price, options }
 ) {
   const [result] = await pool.query(
-    "INSERT INTO products (seller_id, category_id, product_name, price, options) VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO products (seller_id, category_id, product_name, price, options, is_recommended) VALUES (?, ?, ?, ?, ?, ?)",
     [seller_id, category_id, product_name, price, JSON.stringify(options)]
   );
   return result.insertId;

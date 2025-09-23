@@ -44,7 +44,7 @@ const App = () => {
       <div className="mt-16">
         <HomeCategory
           categories={categories}
-          selectedCategoryId={selectedCategoryId ?? 0}
+          selectedCategoryId={selectedCategoryId ?? -1}
           onSelect={handleSelect}
         />
       </div>
