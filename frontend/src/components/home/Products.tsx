@@ -12,27 +12,25 @@ interface Product {
 }
 
 interface Props {
-  categoryId?: number;
+  categoryId?: number | null;
   home: boolean;
   best: boolean;
 }
 
 const fetchProducts = async (
-  categoryId?: number,
+  categoryId?: number | null,
   home: boolean = false,
   best: boolean = false
 ): Promise<Product[]> => {
-  let url = categoryId
-    ? `/api/products?category_id=${categoryId}`
-    : "/api/products";
+  let url = "/api/products";
+  const params = new URLSearchParams();
 
-  if (home) {
-    url += "&home=true";
-  }
+  if (home) params.append("home", "1");
+  if (best) params.append("best", "1");
+  if (!home && !best && categoryId)
+    params.append("category_id", categoryId.toString());
 
-  if (best) {
-    url += "&best=true";
-  }
+  if ([...params].length > 0) url += `?${params.toString()}`;
 
   const { data } = await fetchApi.get(url);
 

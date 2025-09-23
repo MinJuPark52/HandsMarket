@@ -17,21 +17,23 @@ const categories = [
 ];
 
 const App = () => {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(0);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null
+  );
   const [homeFilter, setHomeFilter] = useState<boolean>(false);
   const [bestFilter, setBestFilter] = useState<boolean>(false);
 
   const handleSelect = (category: Category) => {
-    const categoryId = category.id ?? 0;
-    setSelectedCategoryId(categoryId);
-
     if (category.name === "홈") {
+      setSelectedCategoryId(null);
       setHomeFilter(true);
       setBestFilter(false);
     } else if (category.name === "베스트") {
+      setSelectedCategoryId(null);
       setHomeFilter(false);
       setBestFilter(true);
     } else {
+      setSelectedCategoryId(category.id ?? null);
       setHomeFilter(false);
       setBestFilter(false);
     }
@@ -42,7 +44,7 @@ const App = () => {
       <div className="mt-16">
         <HomeCategory
           categories={categories}
-          selectedCategoryId={selectedCategoryId}
+          selectedCategoryId={selectedCategoryId ?? 0}
           onSelect={handleSelect}
         />
       </div>
