@@ -1,6 +1,7 @@
 interface Category {
   id?: number;
   name: string;
+  type?: "home" | "best";
 }
 
 interface Props {
