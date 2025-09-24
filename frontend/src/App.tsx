@@ -10,14 +10,14 @@ interface Category {
   name: string;
   type?: "home" | "best";
 }
+const fixedCategories: Category[] = [
+  { name: "홈", type: "home" },
+  { name: "베스트", type: "best" },
+  { id: 2, name: "지역 상품" },
+  { id: 1, name: "핸드메이드" },
+];
 
 const App = () => {
-  const fixedCategories: Category[] = [
-    { name: "홈", type: "home" },
-    { name: "베스트", type: "best" },
-    { id: 2, name: "지역 상품" },
-    { id: 1, name: "핸드메이드" },
-  ];
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null
