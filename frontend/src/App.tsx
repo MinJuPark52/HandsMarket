@@ -1,50 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Footer from "./components/home/Footer";
 import Products from "./components/home/Products";
 import Slide from "./components/home/Slide";
 import HomeCategory from "./components/home/HomeCategory";
-import fetchApi from "./api";
 
 interface Category {
   id?: number;
   name: string;
-  type?: "home" | "best";
 }
-const fixedCategories: Category[] = [
-  { name: "홈", type: "home" },
-  { name: "베스트", type: "best" },
+
+const categories: Category[] = [
+  { name: "홈" },
+  { name: "베스트" },
   { id: 2, name: "지역 상품" },
   { id: 1, name: "핸드메이드" },
 ];
 
 const App = () => {
-  const [dbCategories, setDbCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null
   );
   const [homeFilter, setHomeFilter] = useState<boolean>(false);
   const [bestFilter, setBestFilter] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const { data } = await fetchApi.get("/api/categories");
-        setDbCategories(data);
-      } catch (err) {
-        console.error("카테고리 불러오기 실패:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  const categories: Category[] = [...fixedCategories, ...dbCategories];
-
   const handleSelect = (category: Category) => {
-    if (category.type === "home") {
+    if (category.name === "home") {
       setSelectedCategoryId(null);
       setHomeFilter(true);
       setBestFilter(false);
-    } else if (category.type === "best") {
+    } else if (category.name === "best") {
       setSelectedCategoryId(null);
       setHomeFilter(false);
       setBestFilter(true);
